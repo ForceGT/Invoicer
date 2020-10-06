@@ -63,7 +63,7 @@ class ListSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return ReceiptListItem();
+    // return ReceiptListItem();
   }
 
   List<String> generateRecentsList() {

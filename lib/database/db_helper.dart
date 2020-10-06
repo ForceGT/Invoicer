@@ -27,8 +27,8 @@ class DBHelper {
     db.execute("CREATE TABLE IF NOT EXISTS Receipts(id INTEGER PRIMARY KEY AUTOINCREMENT, amount INTEGER ,note TEXT , date TEXT, fromName TEXT, "
     "forInvoiceId TEXT, tAndCId TEXT)");
     db.execute("CREATE TABLE IF NOT EXISTS TermsAndConditions(id INTEGER PRIMARY KEY AUTOINCREMENT, term TEXT, type TEXT)");
-    db.execute("CREATE TABLE IF NOT EXISTS Services(id INTEGER PRIMARY KEY AUTOINCREMENT , name TEXT, rate REAL)");
-    db.execute("CREATE TABLE IF NOT EXISTS Clients(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phoneNo INTEGER, email TEXT)");
+    db.execute("CREATE TABLE IF NOT EXISTS Services(id INTEGER PRIMARY KEY AUTOINCREMENT , name TEXT, rate TEXT)");
+    db.execute("CREATE TABLE IF NOT EXISTS Clients(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phoneNo TEXT, email TEXT)");
     db.execute("CREATE TABLE IF NOT EXISTS Invoices(id INTEGER PRIMARY KEY AUTOINCREMENT, amount INTEGER, note TEXT, date TEXT,"
         "listOfProducts TEXT, forReceiptId TEXT, forName TEXT, tAndCId TEXT)");
     db.execute("CREATE TABLE IF NOT EXISTS User(id INTEGER PRIMARY KEY AUTOINCREMENT,companyName TEXT, username TEXT, address TEXT, email TEXT, signImagePath TEXT ,logoImagePath TEXT, phoneNo TEXT, website TEXT)");

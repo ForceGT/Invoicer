@@ -91,10 +91,10 @@ pw.Widget _buildInvoiceContent(pw.Context context) {
 
 pw.Widget _contentTable(pw.Context context) {
   final services = [
-    Service(1, "Photography", 20.0),
-    Service(2, "Wedding Filmography", 40.0),
-    Service(3, "Birthday Photoshoot", 60.0),
-    Service(4, "Some Services", 80.0)
+    Service(id: 1, name: "Photography", rate: 20.0),
+    Service(id: 2, name: "Wedding Filmography", rate: 40.0),
+    Service(id: 3, name: "Birthday Photoshoot", rate: 60.0),
+    Service(id: 4, name: "Some Services", rate: 80.0)
   ];
 
   const tableHeaders = ["No.", "Products/Services", "Amount"];
@@ -191,12 +191,14 @@ pw.Widget _termsAndConditions(pw.Context context) {
     pw.SizedBox(
       height: 40,
     ),
-    pw.Row(children: [pw.Expanded(flex: 2,child: pw.SizedBox()), pw.Expanded(child: pw.Column(
-      children: [
+    pw.Row(children: [
+      pw.Expanded(flex: 2, child: pw.SizedBox()),
+      pw.Expanded(
+          child: pw.Column(children: [
         pw.Text("Signature"),
         pw.Text("Mukund Thakkar Productions")
-      ]
-    ))])
+      ]))
+    ])
   ]);
 }
 

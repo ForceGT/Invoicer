@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:mr_invoice/models/reciept.dart';
 
 class ReceiptListItem extends StatelessWidget {
+
+  final Receipt receipt;
+
+
+  ReceiptListItem(this.receipt);
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.height;
 
+
     final Radius radius = Radius.circular(24.0);
+
+
+
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: GestureDetector(
@@ -32,14 +43,14 @@ class ReceiptListItem extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      "29/09/2020",
+                      "${receipt.date}",
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     SizedBox(
                       height: 10,
                       width: 10,
                     ),
-                    Text("Receipt No"),
+                    Text("${receipt.id}"),
                     SizedBox(
                       height: 10,
                       width: 10,
@@ -49,13 +60,13 @@ class ReceiptListItem extends StatelessWidget {
                       height: 5,
                       width: 10,
                     ),
-                    Text("Invoice Number/Name of Client")
+                    Text("${receipt.fromName}")
                   ],
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Rs 1000"),
+                    Text("${receipt.amount}"),
                     SizedBox(
                       height: 10,
                       width: 10,
@@ -69,4 +80,6 @@ class ReceiptListItem extends StatelessWidget {
       ),
     );
   }
+
+
 }

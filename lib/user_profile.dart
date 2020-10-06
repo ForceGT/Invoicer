@@ -22,7 +22,7 @@ class _UserProfileState extends State<UserProfile> {
             if(snapshot.hasData == false){
 
               return Scaffold(
-                appBar: AppBar(title: Text("User Details"),),
+
                 body: Container(
                   width: MediaQuery.of(context).size.width,
                   child: Column(
@@ -53,6 +53,7 @@ class _UserProfileState extends State<UserProfile> {
             }
             else{
               return Scaffold(
+                appBar: AppBar(title: Text("User Details"),),
                 body: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView(

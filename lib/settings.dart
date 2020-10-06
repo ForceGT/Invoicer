@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mr_invoice/products_list_page.dart';
+import 'package:mr_invoice/clients_list_page.dart';
+import 'package:mr_invoice/services_list_page.dart';
 import 'package:mr_invoice/user_profile.dart';
 class SettingsPage extends StatefulWidget {
   @override
@@ -24,6 +25,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Divider(color: Colors.black54,),
           ListTile(
+            onTap: (){
+              _openClientsPage(context);
+            },
             leading: Icon(Icons.verified_user, color: Colors.white,),
             title: Text("Clients", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             subtitle: Text("Click here to view the list of clients", style: TextStyle(color: Colors.white),),
@@ -46,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
 void _openProductsPage(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute(
       builder: (context){
-        return ProductsPage();
+        return ServiceListPage();
       }
   ));
 }
@@ -57,5 +61,14 @@ void _openUserSettings(BuildContext context) {
     builder: (context){
       return UserProfile();
     }
+  ));
+
+
+}
+void _openClientsPage(BuildContext context){
+  Navigator.of(context).push(MaterialPageRoute(
+      builder: (context){
+        return ClientsListPage();
+      }
   ));
 }

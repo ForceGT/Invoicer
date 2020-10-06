@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mr_invoice/list_search.dart';
+import 'package:mr_invoice/models/reciept.dart';
 import 'package:mr_invoice/widgets/receipt_list_item.dart';
 
 enum SearchOptions { byDate, byName }
@@ -14,6 +15,8 @@ class ReceiptList extends StatefulWidget {
 
 class _ReceiptListState extends State<ReceiptList> {
   SearchOptions _selection = SearchOptions.byName;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +66,39 @@ class _ReceiptListState extends State<ReceiptList> {
           ],
           title: Text("List of Receipts", style: TextStyle(color: Colors.white),),
         ),
-        body: ListView.builder(
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return ReceiptListItem();
-          },
-        ),
+        body: _generateListViewFromReceipts(context)
       );
 
   }
 
+   _generateListViewFromReceipts(BuildContext context){
+
+      return FutureBuilder(
+        future: Receipt.getAllReceipts(),
+        builder: (BuildContext context,AsyncSnapshot<List<Receipt>> snapshot){
+          if(snapshot.hasData){
+            if(snapshot.connectionState == ConnectionState.active){
+              return CircularProgressIndicator();
+            }
+            if(snapshot.connectionState == ConnectionState.done){
+              return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder:(context,index){
+                    return ReceiptListItem(snapshot.data[index]);
+                  }
+              );
+            }
+          }
+          else{
+            return Center(
+              child: Text("No Receipts Added Yet", style: TextStyle(color: Colors.white, fontSize: 18),),
+            );
+          }
+
+        },
+      );
+  }
+
 }
+
+
