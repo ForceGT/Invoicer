@@ -29,6 +29,7 @@ class User {
         _signImagePath = signImagePath,
         _email = email,
         _id = id,
+        _address = address,
         _phoneNo = phoneNo;
 
   String get companyName => _companyName;
