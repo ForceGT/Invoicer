@@ -250,7 +250,6 @@ class _NewUserState extends State<NewUser> {
                           ? tempUser["address"]
                           : "",
                       onChanged: (String address) {
-                        print(address);
                         tempUser["address"] = address;
                       },
                       decoration: InputDecoration(
