@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
 import 'dart:io';
@@ -11,8 +13,6 @@ class NewUser extends StatefulWidget {
 
   User _user;
   bool _isEdit;
-  File _logoImage;
-  File _signImage;
 
   NewUser({user, isEdit})
       : _user = user,
@@ -30,6 +30,9 @@ class _NewUserState extends State<NewUser> {
 
   User _user;
   bool _isEdit;
+  File _logoImage;
+  File _signImage;
+  Map tempUser = Map();
 
   _NewUserState({user, isEdit})
       : _user = user,
@@ -40,32 +43,25 @@ class _NewUserState extends State<NewUser> {
   @override
   void initState() {
     // TODO: implement initState
-    widget._signImage = widget._isEdit == true ? File(widget._user.signImagePath):null;
-    widget._logoImage = widget._isEdit == true ? File(widget._user.logoImagePath):null;
+    _signImage =
+        widget._isEdit == true ? File(widget._user.signImagePath) : null;
+    _logoImage =
+        widget._isEdit == true ? File(widget._user.logoImagePath) : null;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _usernameController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.userName}");
-    final TextEditingController _addressController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.address}");
-    final TextEditingController _emailController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.email}");
-    final TextEditingController _phoneNoController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.phoneNo}");
-    final TextEditingController _companyController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.companyName}");
-    final TextEditingController _websiteController = isEdit == false
-        ? TextEditingController()
-        : TextEditingController(text: "${_user.website}");
-
+    if(_user != null){
+    tempUser["Componey"] = _user.companyName;
+    tempUser["phone"] =  _user.phoneNo;
+    tempUser["Email"] = _user.email;
+    tempUser["address"] = _user.address;
+    tempUser["username"] = _user.userName;
+    //logoImagePath: _logoImage.path
+    tempUser["website"] = _user.website;
+   // signImagePath: _signImage.path
+}
     _drawSignature(BuildContext context) async {
       showDialog(
         context: context,
@@ -88,10 +84,12 @@ class _NewUserState extends State<NewUser> {
                         onPressed: () async {
                           if (_signController.isNotEmpty) {
                             var data = await _signController.toPngBytes();
-
+                            Directory directory = await getExternalStorageDirectory();
+                            File('${directory.path}/signedImage.png').writeAsBytesSync(data.buffer.asInt8List());
+                            var file =await File("${directory.path}/signedImage.png");
                             setState(() {
-                              widget._signImage = File.fromRawPath(data);
-                              print("_signImage" + "${widget._signImage.path}");
+                              _signImage = file;
+                              print("_signImage" + "${_signImage.path}");
                             });
                           }
                           Navigator.pop(context);
@@ -115,14 +113,16 @@ class _NewUserState extends State<NewUser> {
     }
 
     _showImagePicker(BuildContext context, String type) async {
+      print(_user);
+
       var pickedImage = await ImagePicker()
           .getImage(source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
       if (type == "logo") {
         setState(() {
-          widget._logoImage = File(pickedImage.path);
+          _logoImage = File(pickedImage.path);
         });
       } else {
-        widget._signImage = File(pickedImage.path);
+        _signImage = File(pickedImage.path);
       }
     }
 
@@ -138,7 +138,12 @@ class _NewUserState extends State<NewUser> {
                   padding: const EdgeInsets.all(8.0),
                   child: Column(children: [
                     TextFormField(
-                      controller: _usernameController,
+                      initialValue: tempUser.containsKey("username")
+                          ? tempUser["username"]
+                          : "",
+                      onChanged: (String phone) {
+                        tempUser["username"] = phone;
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -155,7 +160,12 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
-                      controller: _companyController,
+                      onChanged: (String data) {
+                        tempUser["Componey"] = data;
+                      },
+                      initialValue: tempUser.containsKey("Componey")
+                          ? tempUser["Componey"]
+                          : "",
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -172,7 +182,13 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
-                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      initialValue: tempUser.containsKey("Email")
+                          ? tempUser["Email"]
+                          : "",
+                      onChanged: (String email) {
+                        tempUser["Email"] = email;
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -181,6 +197,8 @@ class _NewUserState extends State<NewUser> {
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Email Address cannot be empty";
+                        } else if (!value.contains("@")) {
+                          return "Invalid Email Address";
                         }
                         return null;
                       },
@@ -189,7 +207,12 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
-                      controller: _phoneNoController,
+                      initialValue: tempUser.containsKey("phone")
+                          ? tempUser["phone"]
+                          : "",
+                      onChanged: (String phone) {
+                        tempUser["phone"] = phone;
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -207,7 +230,12 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
-                      controller: _websiteController,
+                      initialValue: tempUser.containsKey("website")
+                          ? tempUser["website"]
+                          : "",
+                      onChanged: (String website) {
+                        tempUser["website"] = website;
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -218,7 +246,12 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
-                      controller: _addressController,
+                      initialValue: tempUser.containsKey("address")
+                          ? tempUser["address"]
+                          : "",
+                      onChanged: (String address) {
+                        tempUser["address"] = address;
+                      },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
@@ -273,14 +306,14 @@ class _NewUserState extends State<NewUser> {
                                 color: Colors.blueGrey,
                                 alignment: Alignment.center,
                                 height: 300,
-                                child: widget._logoImage != null
+                                child: _logoImage != null
                                     ? Column(
                                         children: [
                                           ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(24.0),
                                               child: Image.file(
-                                                widget._logoImage,
+                                                _logoImage,
                                               )),
                                           SizedBox(
                                             height: 10,
@@ -341,8 +374,7 @@ class _NewUserState extends State<NewUser> {
                                       ),
                                       GestureDetector(
                                         child: RaisedButton(
-                                          onPressed: () =>
-                                              _drawSignature(bc),
+                                          onPressed: () => _drawSignature(bc),
                                           child: Text("Draw sign again"),
                                         ),
                                       ),
@@ -353,7 +385,7 @@ class _NewUserState extends State<NewUser> {
                             : Container(
                                 color: Colors.blueGrey,
                                 height: 300,
-                                child: widget._signImage == null
+                                child: _signImage == null
                                     ? Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
@@ -381,7 +413,7 @@ class _NewUserState extends State<NewUser> {
                                         children: [
                                           ClipRect(
                                               child: Image.file(
-                                            widget._signImage,
+                                            _signImage,
                                           )),
                                           SizedBox(
                                             height: 10,
@@ -429,35 +461,31 @@ class _NewUserState extends State<NewUser> {
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
-                              if (widget._logoImage == null ||
-                                  widget._signImage == null) {
+                              if (_logoImage == null || _signImage == null) {
                                 var snackbar = SnackBar(
                                   content: Text("Logo and Sign can't be empty"),
                                 );
                                 Scaffold.of(bc).showSnackBar(snackbar);
                                 return;
                               }
-
-                              print("Address:"+_addressController.text);
+                              print("Address:" + tempUser["address"]);
 
                               User user = User(
-                                companyName: _companyController.text,
-                                phoneNo: _phoneNoController.text,
-                                email: _emailController.text,
-                                address: _addressController.text,
-                                username: _usernameController.text,
-                                logoImagePath: widget._logoImage.path,
-                                website: _websiteController.text,
-                                signImagePath: widget._signImage.path,
+                                companyName: tempUser["Componey"],
+                                phoneNo: tempUser["phone"],
+                                email: tempUser["Email"],
+                                address: tempUser["address"],
+                                username: tempUser["username"],
+                                logoImagePath: _logoImage.path,
+                                website: tempUser["website"],
+                                signImagePath: _signImage.path,
                               );
-
                               if (isEdit == false) {
                                 User.insertUser(user);
                               } else {
                                 User.updateUser(user);
                               }
-                              Navigator.pop(bc,true);
-
+                              Navigator.pop(bc, true);
                             }
                           },
                         )
