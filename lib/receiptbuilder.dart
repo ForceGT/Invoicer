@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'models/reciept.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -15,7 +14,7 @@ Widget getPdfPreview(double width, double height,Receipt receipt
         return Scaffold(
           appBar: AppBar(title: Text("View Receipt Preview"),),
           body: PdfPreview(
-             //pdfFileName: "${receipt == null ? "rcpt_1 ":"rcpt_${receipt.id}"}",
+            pdfFileName: "${receipt == null ? "rcpt_1 ":"rcpt_${receipt.id}_${receipt.date}"}",
             allowPrinting: false,
             canChangePageFormat: false,
             actions: [

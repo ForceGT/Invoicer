@@ -13,8 +13,35 @@ class HomePage extends StatefulWidget {
 }
 
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
+
+  AnimationController _moneyBagSlideController;
+  AnimationController _userNameHelloFadeIn;
+  AnimationController _usernameFadeIn;
+
+  Animation<Offset> _moneyBagSlideAnimation;
+  Animation<double> _helloFadeInAnimation;
+  Animation<double> _usernameFadeInAnimation;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _moneyBagSlideController = AnimationController(duration: Duration(milliseconds: 800),vsync: this);
+    _usernameFadeIn = AnimationController(duration: Duration(milliseconds: 1000),vsync: this);
+    _userNameHelloFadeIn = AnimationController(duration: Duration(milliseconds: 800),vsync: this);
+    _moneyBagSlideAnimation = Tween<Offset>(begin: Offset(1,0),end: Offset.zero).animate(_moneyBagSlideController);
+    _helloFadeInAnimation = Tween<double>(begin: 0,end: 1).animate(CurvedAnimation(parent: _userNameHelloFadeIn,curve: Curves.bounceOut));
+    _usernameFadeInAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _usernameFadeIn,curve: Curves.easeIn));
+    _moneyBagSlideController.forward();
+    _userNameHelloFadeIn.forward();
+    _userNameHelloFadeIn.addListener(() {
+      if(_userNameHelloFadeIn.isCompleted){
+        _usernameFadeIn.forward();
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -25,16 +52,19 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children:<Widget>[
           TopCurve(headerHeight,headerWidth),
-          Transform.translate(
-              offset: Offset(screenWidth*0.50,screenHeight*0.001),
-              child: Transform.rotate(
-                  angle: 0.2,
-                  child: Image.asset("images/moneybag.png",
-                    height: screenHeight/1.9,
-                    width: screenWidth/1.9,
+          SlideTransition(
+            position: _moneyBagSlideAnimation,
+            child: Transform.translate(
+                offset: Offset(screenWidth*0.50,screenHeight*0.001),
+                child: Transform.rotate(
+                    angle: 0.2,
+                    child: Image.asset("images/moneybag.png",
+                      height: screenHeight/1.9,
+                      width: screenWidth/1.9,
 
-                  )
-              )
+                    )
+                )
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16.0,right: 16.0),
@@ -53,13 +83,19 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          "Hello,",
-                          style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 32,fontWeight: FontWeight.bold),
+                        FadeTransition(
+                          opacity:_helloFadeInAnimation,
+                          child: Text(
+                            "Hello,",
+                            style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 32,fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        Text(
-                          "Username",
-                          style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 24),
+                        FadeTransition(
+                          opacity: _usernameFadeInAnimation,
+                          child: Text(
+                            "Username",
+                            style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 24),
+                          ),
                         )
                       ],
                     ),
@@ -69,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                         alignment: Alignment.topRight,
                         child: IconButton(
                           icon: Icon(Icons.settings),
-                          color: Colors.white70,
+                          color: Color(0xFFffe4e4),
                           onPressed: () {
                             _openSettings(context);
                           },),
@@ -178,10 +214,11 @@ class _HomePageState extends State<HomePage> {
 
   Widget _getHomeCard(String title, String subtitle){
     return Container(
+      color: Colors.transparent,
       child: Card(
         color: Colors.black54,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0)
+            borderRadius: BorderRadius.circular(20.0)
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

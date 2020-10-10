@@ -113,15 +113,22 @@ class _NewClientState extends State<NewClient> {
                           _emailController.text.isEmpty ||
                           _phoneNoController.text.isEmpty) {
                         Scaffold.of(bc).showSnackBar(SnackBar(
-                            content: Text("Name,Email and Phone Number can't be empty")));
+                            content: Text("Name,Email and Phone Number can't be empty!")));
                         return;
                       }
-                      Client client = Client(
-                          name: _nameController.text, email: _emailController.text, phoneNo: _phoneNoController.text);
+
                       if (widget._isEdit == true) {
+                        Client client = Client(id: widget._client.id,
+                            name: _nameController.text, email: _emailController.text, phoneNo: _phoneNoController.text);
                         Client.updateClient(client);
+                        Scaffold.of(bc).showSnackBar(SnackBar(
+                            content: Text("Updated Client successfully!")));
                       } else {
+                        Client client = Client(
+                            name: _nameController.text, email: _emailController.text, phoneNo: _phoneNoController.text);
                         Client.insertClient(client);
+                        Scaffold.of(bc).showSnackBar(SnackBar(
+                            content: Text("Inserted new client successfully!")));
                       }
                       Navigator.pop(context, true);
                     },

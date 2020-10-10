@@ -78,7 +78,7 @@ class Receipt {
 
   static Future<int> getLatestId() async {
     final db = await DBHelper.db.database;
-    print(db);
+    //print(db);
     var latestId =
         await db.rawQuery("SELECT MAX(id)+1 as last_inserted_id FROM Receipts");
     //print("latestId="+latestId.toString()+"\n");
@@ -117,9 +117,7 @@ class Receipt {
 
   static updateReceipt(Receipt receipt) async {
     final db = await DBHelper.db.database;
-    var map = receipt.toMap();
-    map.remove("id");
-    var result = db.update("Receipts", map);
+    db.rawUpdate("UPDATE Receipts");
   }
 
   static deleteReceipt(int id) async {

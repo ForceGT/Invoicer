@@ -6,41 +6,68 @@ class TandC {
   String _terms;
   String _type;
   int _id;
+  bool _isSelected=false;
+
+  TandC({id, terms, type})
+      : _id = id,
+        _terms = terms,
+        _type = type;
+
+  String get terms => _terms;
 
   String get type => _type;
 
-  TandC(int _id,this._terms, this._type);
 
-  String get terms => _terms;
+  bool get isSelected => _isSelected;
+
+  set isSelected(bool value) {
+    _isSelected = value;
+  }
 
   int get id => _id;
   static final columns = ["id", "terms", "type"];
 
   factory TandC.fromMap(Map<String, dynamic> data) {
-    return TandC(data["id"],data["terms"], data["type"]);
+    return TandC(id:data["id"], terms:data["terms"], type:data["type"]);
   }
 
-  Map<String, dynamic> toMap() => {"id":_id,"terms": _terms, "type": _type};
+  Map<String, dynamic> toMap() => {"id": _id, "terms": _terms, "type": _type};
 
-  Future<List<TandC>> getAllTandCfromDB() async {
+  static Future<List<TandC>> getAllTandCfromDB() async {
     final db = await DBHelper.db.database;
-    List<Map> allReceipts =
-        await db.query("TermsAndConditions", columns: TandC.columns, orderBy: "id ASC");
-
-    List<TandC> termsList = new List();
-    allReceipts.forEach((result) {
-      TandC terms = TandC.fromMap(result);
-      termsList.add(terms);
-    });
-
-    return termsList;
+    var results = await db.query("TermsAndConditions",
+        columns: TandC.columns, orderBy: "id ASC");
+    return results.map((result) => TandC.fromMap(result)).toList();
   }
 
-  Future<void> insertTermIntoDB(TandC tandC) async{
+  static Future<void> insertTermIntoDB(TandC tandC) async {
     final db = await DBHelper.db.database;
     db.insert("TermsAndConditions", tandC.toMap());
   }
 
+  static Future<int> deleteItem(int id) async {
+    final db = await DBHelper.db.database;
+    var result = db.delete("TermsAndConditions", where: "id=?", whereArgs: [id]);
+    return result;
+  }
 
+  static getDefaultTerms() async {
+    final db = await DBHelper.db.database;
+    db.rawQuery("SELECT * FROM TermsAndConditions WHERE type=?", ["default"]);
+  }
+  static updateTerms(TandC tandC) async {
+    final db = await DBHelper.db.database;
+    db.rawUpdate("UPDATE TermsAndConditions SET terms=?,type=? WHERE id=?",[tandC.terms,tandC.type,tandC.id]);
+  }
 
+  static Future<TandC> getTermsById(int id) async {
+    final db = await DBHelper.db.database;
+    db.query("TermsAndConditions",where: "id=?",whereArgs: [id]);
+  }
+
+  static Future<List<TandC>> getTermsByIds(String ids) async {
+    final db = await DBHelper.db.database;
+    var results = await db.rawQuery("SELECT * FROM TermsAndConditions WHERE id IN "+ids);
+    return results.map((result)=>TandC.fromMap(result)).toList();
+  }
 }

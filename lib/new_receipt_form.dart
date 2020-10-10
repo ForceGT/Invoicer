@@ -5,7 +5,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:mr_invoice/receiptbuilder.dart';
 import 'models/reciept.dart';
-
+import 'models/client.dart';
 
 class NewReceiptForm extends StatefulWidget {
   const NewReceiptForm();
@@ -21,20 +21,13 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var clientName = "";
   var amount;
-  Future<dynamic> _id;
   String _currentDate = DateFormat("dd-MM-yyyy").format(DateTime.now());
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    _id = Receipt.getLatestId();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _id,
+        future: Receipt.getLatestId(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           return Column(
             children: [
@@ -81,7 +74,7 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                             controller: _clientController,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(24.0)
+                                    borderRadius: BorderRadius.circular(8.0)
                                 ),
                                 labelText: "Client Name",
                                 hintText: "Enter your Client Name Here")),
@@ -92,24 +85,30 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                           );
                         },
                         noItemsFoundBuilder: (context) {
-                          return Text(
-                            "No items found",
+                          return ListTile(
+                            title:Text("No items found",
                             style: TextStyle(
                                 fontStyle: FontStyle.italic,
+                                fontSize: 18,
                                 color: Theme
                                     .of(context)
                                     .errorColor),
-                          );
+                          ));
                         },
                         suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                            color: Colors.blueGrey[300],
+                            elevation: 6.0,
                             borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(8.0),
+                                topLeft: Radius.circular(8.0),
                                 bottomRight: Radius.circular(16.0),
                                 bottomLeft: Radius.circular(16.0))),
                         transitionBuilder: (context, suggestionsBox,
                             controller) {
-                          return FadeTransition(
+                          controller.duration = Duration(milliseconds: 100);
+                          return SizeTransition(
                             child: suggestionsBox,
-                            opacity: CurvedAnimation(
+                            sizeFactor: CurvedAnimation(
                               parent: controller,
                               curve: Curves.easeIn,
                               reverseCurve: Curves.easeOut,
@@ -119,8 +118,11 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                         onSuggestionSelected: (suggestion) {
                           this._clientController.text = suggestion;
                         },
-                        suggestionsCallback: (pattern) {
-                          return List.generate(1, (index) => "$index");
+                        suggestionsCallback: (pattern) async{
+                          if(pattern!=""){
+                            return await Client.getClientsByPattern(pattern);
+                          }
+
                         },
 
                         validator: (value) {
@@ -142,7 +144,7 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                       child: TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(24.0)
+                                borderRadius: BorderRadius.circular(8.0)
                             ),
                             labelText: "Amount in Rs",
                             hintText: "Enter the receipt amount here"),
@@ -170,7 +172,7 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                   padding: EdgeInsets.all(14.0),
                   onPressed: () async{
                     if (_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
+                      //_formKey.currentState.save();
                       var receipt = Receipt(fromName: clientName,
                           amount: amount,
                           date: _currentDate);
@@ -189,6 +191,9 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                       )
                       );
                     }
+                    setState(() {
+
+                    });
                   },
                   child: Text("Save Form"),
                 ),

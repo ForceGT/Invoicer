@@ -1,31 +1,46 @@
-
+import 'package:mr_invoice/database/db_helper.dart';
 
 class Invoice {
   int _id;
   int _amount;
   String _note;
+  String _tAndCId;
 
-  int _tAndCId;
   //The entire listOfProductIds will be stored as a single string separated by |
-  String _listOfProductIds;
-
 
   String _forName;
   String _date;
   int _forReceiptId;
 
-  String get listOfProductIds => _listOfProductIds;
+  String _listofProductIds;
 
-  Invoice(this._id, this._amount, this._note, this._tAndCId,
-      this._listOfProductIds, this._forName, this._date, this._forReceiptId);
+  Invoice(
+      {id,
+      amount,
+      note,
+      tAndCId,
+      listOfProductIds,
+      forName,
+      date,
+      forReceiptId})
+      : _id = id,
+        _amount = amount,
+        _note = note,
+        _tAndCId = tAndCId,
+        _forReceiptId = forReceiptId,
+        _listofProductIds = listOfProductIds,
+        _forName = forName,
+        _date = date;
 
   String get date => _date;
 
   String get forName => _forName;
 
-  String get listofProductIds => _listOfProductIds;
 
-  int get tAndCId => _tAndCId;
+  String get listofProductIds => _listofProductIds;
+
+  String get tAndCId => _tAndCId;
+
   String get note => _note;
 
   int get amount => _amount;
@@ -33,6 +48,35 @@ class Invoice {
   int get id => _id;
 
   int get forReceiptId => _forReceiptId;
+
+  set note(String value) {
+    _note = value;
+  }
+
+  set tAndCId(String value) {
+    _tAndCId = value;
+  }
+
+  set forName(String value) {
+    _forName = value;
+  }
+
+  set date(String value) {
+    _date = value;
+  }
+
+  set forReceiptId(int value) {
+    _forReceiptId = value;
+  }
+
+  set listofProductIds(String value) {
+    _listofProductIds = value;
+  }
+
+
+  set amount(int value) {
+    _amount = value;
+  }
 
   static final columns = [
     "id",
@@ -45,29 +89,50 @@ class Invoice {
     "tAndCId"
   ];
 
-
-  factory Invoice.fromMap(Map<String, dynamic> data){
+  factory Invoice.fromMap(Map<String, dynamic> data) {
     return Invoice(
-      data["id"],
-      data["amount"],
-      data["note"],
-      data["tAndCId"],
-      data["listOfProducts"],
-      data["forName"],
-      data["date"],
-      data["forReceiptId"]
-    );
+        id:data["id"],
+        amount:data["amount"],
+        note:data["note"],
+        tAndCId:data["tAndCId"],
+        listOfProductIds:data["listOfProducts"],
+        forName:data["forName"],
+        date:data["date"],
+        forReceiptId:data["forReceiptId"]);
   }
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         "id": _id,
         "amount": _amount,
         "note": _note,
         "tAndCId": _tAndCId,
-        "listOfProducts":_listOfProductIds ,
+        "listOfProducts": _listofProductIds,
         "forName": _forName,
-        "date":_date,
-        "forReceiptId":_forReceiptId
+        "date": _date,
+        "forReceiptId": _forReceiptId
       };
+
+
+
+  static Future<int> getLatestId() async{
+    final db = await DBHelper.db.database;
+    var latestId =
+        await db.rawQuery("SELECT MAX(id)+1 as last_inserted_id FROM Invoices");
+    //print("latestId="+latestId.toString()+"\n");
+    return latestId.first["last_inserted_id"] == null? 1:latestId.first["last_inserted_id"];
+  }
+
+
+  static insertInvoice(Invoice invoice) async {
+    final db = await DBHelper.db.database;
+    db.insert("Invoices", invoice.toMap());
+  }
+
+  static Future<Invoice> getInvoiceById(int id) async {
+    final db = await DBHelper.db.database;
+    var results = await db.query("Invoices",where: "id=?",whereArgs: [id]);
+    return Invoice.fromMap(results.first);
+  }
+
+
 }

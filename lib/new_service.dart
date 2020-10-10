@@ -83,15 +83,23 @@ class _NewServiceState extends State<NewService> {
                     if (_nameController.text.isEmpty ||
                         _rateController.text.isEmpty) {
                       Scaffold.of(bc).showSnackBar(SnackBar(
-                          content: Text("Rate and Name can't be empty")));
+                          content: Text("Rate and Name can't be empty!")));
                       return;
                     }
-                    Service service = Service(
-                        name: _nameController.text, rate: _rateController.text);
+
                     if (widget._isEdit == true) {
+                      Service service = Service(
+                        id: widget._service.id,
+                          name: _nameController.text, rate: _rateController.text);
                       Service.updateService(service);
+                      Scaffold.of(bc).showSnackBar(SnackBar(
+                          content: Text("Service updated successfully!")));
                     } else {
+                      Service service = Service(
+                          name: _nameController.text, rate: _rateController.text);
                       Service.insertService(service);
+                      Scaffold.of(bc).showSnackBar(SnackBar(
+                          content: Text("Service inserted successfully!")));
                     }
                     Navigator.pop(context, true);
                   },

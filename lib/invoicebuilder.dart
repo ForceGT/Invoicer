@@ -1,28 +1,61 @@
 import 'dart:typed_data';
-
+import 'package:flutter/material.dart';
+import 'package:mr_invoice/models/TandC.dart';
+import 'package:mr_invoice/models/client.dart';
 import 'package:mr_invoice/models/service.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'models/invoice.dart';
 
-Future<Uint8List> buildInvoicePdf(PdfPageFormat pageFormat) async {
+Widget getInvoicePdfPreview(Invoice invoice) {
+  return PdfPreview(
+      allowPrinting: false,
+      canChangePageFormat: false,
+      maxPageWidth: 700,
+      build: (pageFormat) {
+        return buildInvoicePdf(pageFormat, invoice);
+      });
+}
+
+Future<Uint8List> buildInvoicePdf(
+    PdfPageFormat pageFormat, Invoice invoice) async {
+  // print("Invoice ID: ${invoice.id}");
+  // print("Invoice ListOfProductIds ${invoice.listofProductIds}");
+  // print("Invoice ListOfTandCIds ${invoice.tAndCId}");
+  Client client = await getClientDetails(invoice.forName);
+  List<Service> services =
+      await Service.getServiceFromIds(invoice.listofProductIds);
+  List<TandC> terms = await TandC.getTermsByIds(invoice.tAndCId);
   final doc = pw.Document();
-
   doc.addPage(pw.MultiPage(
       margin: pw.EdgeInsets.all(10.0),
       header: _buildHeader,
-      footer: _buildFooter,
-      build: (context) => [_buildInvoiceContent(context)]));
+      footer: null,
+      build: (context) {
+        return [
+          _buildInvoiceContent(context, invoice, client, services, terms)
+        ];
+      }));
 
   return doc.save();
+}
+
+
+
+Future<Client> getClientDetails(String name) async {
+  var client = await Client.getClientByName(name);
+  return client;
 }
 
 pw.Widget _buildHeader(pw.Context context) {
   return pw.Padding(
     padding: pw.EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
-    child: pw.Column(children: [
+    child:
+        pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
       pw.Row(
           mainAxisSize: pw.MainAxisSize.min,
-          mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: pw.MainAxisAlignment.start,
           children: [
             pw.Container(
                 alignment: pw.Alignment.centerLeft,
@@ -47,7 +80,8 @@ pw.Widget _buildHeader(pw.Context context) {
   );
 }
 
-pw.Widget _buildInvoiceContent(pw.Context context) {
+pw.Widget _buildInvoiceContent(pw.Context context, Invoice invoice,
+    Client client, List<Service> services, List<TandC> terms) {
   return pw.Padding(
       padding: pw.EdgeInsets.all(8.0),
       child: pw.Column(
@@ -63,40 +97,48 @@ pw.Widget _buildInvoiceContent(pw.Context context) {
                 pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.SizedBox(height: 20),
+                      pw.SizedBox(height: 30),
                       pw.Text("Invoice To",
                           style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                      pw.Text("Customer Name"),
-                      pw.Text("Customer Email"),
-                      pw.Text("Customer Contact No")
+                              fontSize: 22, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(client.name == null
+                          ? "Customer Name"
+                          : "${client.name}",style: pw.TextStyle(
+                          fontSize: 18)),
+                      pw.SizedBox(height: 2),
+                      pw.Text(client.email == null
+                          ? "Customer Email"
+                          : "${client.email}"),
+                      pw.Text(client.phoneNo == null
+                          ? "Customer Contact No"
+                          : "${client.phoneNo}")
                     ]),
                 pw.Spacer(),
                 pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text("Invoice Number",
+                      pw.Text(
+                          invoice.id == null
+                              ? "Invoice Number"
+                              : "INV ${invoice.id}",
                           style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                      pw.Text("Date Of Invoice")
+                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(invoice.date == null
+                          ? "Date Of Invoice"
+                          : "${invoice.date}",style: pw.TextStyle(
+                          fontSize: 16))
                     ])
               ]),
           pw.SizedBox(height: 20),
-          _contentTable(context),
+          _contentTable(context, services, invoice.amount),
           pw.SizedBox(height: 20),
-          _termsAndConditions(context)
+          _termsAndConditions(context, terms)
         ],
       ));
 }
 
-pw.Widget _contentTable(pw.Context context) {
-  final services = [
-    Service(id: 1, name: "Photography", rate: 20.0),
-    Service(id: 2, name: "Wedding Filmography", rate: 40.0),
-    Service(id: 3, name: "Birthday Photoshoot", rate: 60.0),
-    Service(id: 4, name: "Some Services", rate: 80.0)
-  ];
-
+pw.Widget _contentTable(
+    pw.Context context, List<Service> services, int amount) {
   const tableHeaders = ["No.", "Products/Services", "Amount"];
   return pw.Column(children: [
     pw.Table.fromTextArray(
@@ -137,7 +179,7 @@ pw.Widget _contentTable(pw.Context context) {
                 padding: pw.EdgeInsets.all(16.0),
                 color: PdfColors.blue,
                 alignment: pw.Alignment.centerRight,
-                child: pw.Text("200.0",
+                child: pw.Text(amount == null ? "Amount" : "$amount",
                     style: pw.TextStyle(
                         fontSize: 20, fontWeight: pw.FontWeight.bold))),
           ]))
@@ -145,7 +187,7 @@ pw.Widget _contentTable(pw.Context context) {
   ]);
 }
 
-pw.Widget _termsAndConditions(pw.Context context) {
+pw.Widget _termsAndConditions(pw.Context context, List<TandC> terms) {
   return pw.Column(children: [
     pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.end,
@@ -165,21 +207,25 @@ pw.Widget _termsAndConditions(pw.Context context) {
                 child: pw.Text(
                   'Terms & Conditions',
                   style: pw.TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: PdfColors.blue,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
               ),
-              pw.Text(
-                pw.LoremText().paragraph(40),
-                textAlign: pw.TextAlign.justify,
-                style: const pw.TextStyle(
-                  fontSize: 6,
-                  lineSpacing: 2,
-                  color: PdfColors.blueGrey800,
-                ),
-              ),
+              pw.ListView.builder(
+                  itemCount: terms.length,
+                  itemBuilder: (context, index) {
+                    return pw.Text(
+                      "${index+1}. ${terms[index].terms}",
+                      textAlign: pw.TextAlign.center,
+                      style: const pw.TextStyle(
+                        fontSize: 12,
+                        lineSpacing: 2,
+                        color: PdfColors.blueGrey800,
+                      ),
+                    );
+                  }),
             ],
           ),
         ),
@@ -202,8 +248,8 @@ pw.Widget _termsAndConditions(pw.Context context) {
   ]);
 }
 
-pw.Widget _buildFooter(pw.Context context) {
-  return pw.Row(mainAxisAlignment: pw.MainAxisAlignment.end, children: [
-    pw.Text("Pdf generated by Mr Invoice for  Mukund Thakkar Productions")
-  ]);
-}
+// pw.Widget _buildFooter(pw.Context context) {
+//   return pw.Row(mainAxisAlignment: pw.MainAxisAlignment.end, children: [
+//     pw.Text("Pdf generated by Mr Invoice for  Mukund Thakkar Productions")
+//   ]);
+// }

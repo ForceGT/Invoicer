@@ -1,9 +1,11 @@
+
 import 'package:mr_invoice/database/db_helper.dart';
 
 class Service {
   int _id;
   String _name;
 
+  bool _isSelected=false;
   String _rate;
 
   Service({id, name, rate})
@@ -14,6 +16,13 @@ class Service {
   String get rate => _rate;
 
   String get name => _name;
+
+
+  bool get isSelected => _isSelected;
+
+  set isSelected(bool value) {
+    _isSelected = value;
+  }
 
   int get id => _id;
   static final columns = ["id", "name", "rate"];
@@ -45,15 +54,25 @@ class Service {
   
   static updateService(Service service) async {
     final db = await DBHelper.db.database;
-    var map = service.toMap();
-    map.remove("id");
-    db.update("Services", map);
+    db.rawUpdate("UPDATE Services SET name=?,rate=? WHERE id=?",[service.name,service.rate,service.id]);
   }
   
   static Future<List<Service>> getAllServices() async {
     final db = await DBHelper.db.database;
     var results = await db.query("Services", columns: Service.columns, orderBy: "id ASC");
-    print(results);
+    //print("getAllServices():" + "$results");
+    return results.map((result) => Service.fromMap(result)).toList();
+  }
+
+  static Future<int> deleteService(int id) async {
+    final db = await DBHelper.db.database;
+    var result = db.delete("Services",where: "id=?",whereArgs: [id]);
+    return result;
+  }
+
+  static Future<List<Service>> getServiceFromIds(String ids) async {
+    final db = await DBHelper.db.database;
+    var results = await db.rawQuery("SELECT * FROM Services WHERE id IN "+ids);
     return results.map((result) => Service.fromMap(result)).toList();
   }
 }
