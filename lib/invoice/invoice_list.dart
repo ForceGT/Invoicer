@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mr_invoice/widgets/invoice_list_item.dart';
 import 'package:mr_invoice/list_search.dart';
+import 'models/invoice.dart';
 
 enum SearchOptions { byDate, byName }
 
@@ -21,9 +22,7 @@ class _InvoiceListState extends State<InvoiceList> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return Scaffold(
-      backgroundColor: Colors.grey[900],
       appBar: AppBar(
-        backgroundColor: Colors.orange,
         leading: IconButton(
           color: Colors.white,
             icon: Icon(Icons.arrow_back_ios),
@@ -35,7 +34,7 @@ class _InvoiceListState extends State<InvoiceList> {
             color: Colors.white,
             disabledColor: Colors.white,
             onPressed: () {
-              showSearch(context: context, delegate: ListSearch());
+              showSearch(context: context, delegate: ListSearch(type: "invoice"));
             },
           ),
           PopupMenuButton<SearchOptions>(
@@ -63,14 +62,28 @@ class _InvoiceListState extends State<InvoiceList> {
         ],
         title: Text("List of Invoices",style: TextStyle(color: Colors.white),),
       ),
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return InvoiceListItem();
-        },
-      ),
+      body:_getInvoiceList(context),
     );
 
+  }
+
+  Widget _getInvoiceList(BuildContext context){
+    return FutureBuilder(
+        future: Invoice.getAllInvoices(),
+        builder: (context,AsyncSnapshot<List<Invoice>> snapshot){
+
+          if(!snapshot.hasData || snapshot.data.isEmpty ){
+            return Center(
+              child: Text("No Invoices Added Yet", style: TextStyle(color: Colors.white, fontSize: 18),),
+            );
+          }
+          else{
+            return ListView.builder(itemCount: snapshot.data.length,itemBuilder: (context,index){
+                return InvoiceListItem(snapshot.data[index]);
+            });
+          }
+
+        });
   }
 
 }

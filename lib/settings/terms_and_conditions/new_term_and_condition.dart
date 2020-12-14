@@ -42,26 +42,26 @@ class _NewTermState extends State<NewTerm> {
                 Container(
                   alignment: Alignment.center,
                   height: 300,
-                  child: Container(
-                    height: 210,
-                    width: 210,
-                    child: CircleAvatar(
-                      child: Icon(Icons.analytics_outlined,size: 210,),
+                  child: CircleAvatar(
+                    radius: 120,
+                    child: Icon(Icons.analytics_outlined,size: 210,),
 
-                    ),
                   ),
                 ),
-                Text("T&C details",style: TextStyle(fontSize: 32),),
+                Text("T&C details",style: TextStyle(fontSize: 32,color: Colors.white)),
                 Padding(padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
                   child:Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0)),
+                    color: Color(0xFF346588),
                     elevation: 8.0,
                     child: ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.all(4.0),
-                      leading: Icon(Icons.analytics_outlined,size: 30,),
+                      leading: Icon(Icons.analytics_outlined,size: 30,color: Colors.white,),
                       title: TextField(
                         maxLines: 5,
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18,color: Colors.white),
                         controller: _termController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
@@ -72,7 +72,10 @@ class _NewTermState extends State<NewTerm> {
                             borderRadius: BorderRadius.circular(12.0)
                           ),
                           hintText: "Enter Term ",
+                          hintStyle: TextStyle(color: Colors.grey),
                           labelText: "Term",
+                            labelStyle:
+                            TextStyle(color: Colors.grey[400])
                         ),
                       ),
                     ),
@@ -82,7 +85,7 @@ class _NewTermState extends State<NewTerm> {
                     padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
                     child: CheckboxListTile(
                       value: this.isChecked,
-                      title: Text("Mark as default"),
+                      title: Text("Mark as default",style: TextStyle(color: Colors.white,fontSize: 18),),
                       onChanged: (value){
                         termValue = _termController.text;
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:mr_invoice/new_client.dart';
 
@@ -41,7 +42,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
           children: [
             Text(
               "No client added yet",
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18,color: Colors.white),
             ),
             SizedBox(
               height: 10,
@@ -79,6 +80,9 @@ class _ClientsListPageState extends State<ClientsListPage> {
             return Padding(
               padding: EdgeInsets.fromLTRB(0, 2.0, 0, 0),
               child: Card(
+                color: Color(0xFF346588),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0)),
                 elevation: 8.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -86,10 +90,12 @@ class _ClientsListPageState extends State<ClientsListPage> {
                     Flexible(
                       flex: 1,
                       child: CircleAvatar(
+                        backgroundColor: Color(0xFFffc1c8),
                         radius: 22,
                         child: Icon(
-                          Icons.account_circle,
+                          MdiIcons.accountOutline,
                           size: 35,
+                          color: Colors.black54,
                         ),
                       ),
                     ),
@@ -107,27 +113,37 @@ class _ClientsListPageState extends State<ClientsListPage> {
                               snapshot.data[index].name,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 2.0, 0, 0.0),
                             child: Text(snapshot.data[index].email,
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w300)),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w300,
+                                    color: Color(0xFFd4d4d1))),
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 0.0, 0, 4.0),
                             child: Text(snapshot.data[index].phoneNo,
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w300)),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w300,
+                                    color: Color(0xFFd4d4d1))),
                           ),
                         ],
                       ),
                     ),
                     Wrap(children: [
                       IconButton(
-                        icon: Icon(Icons.edit_outlined, size: 20),
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          size: 20,
+                          color: Color(0xFFfffde1),
+                        ),
                         onPressed: () async {
                           var result = await Navigator.of(context).push(
                               MaterialPageRoute(
@@ -141,17 +157,14 @@ class _ClientsListPageState extends State<ClientsListPage> {
                         },
                       ),
                       IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          size: 20,
-                        ),
+                        icon:
+                            Icon(Icons.delete, size: 20, color: Color(0xFFfffde1)),
                         onPressed: () async {
-
                           bool dialogShowCompleted;
                           dialogShowCompleted = await showDialog(
                               context: context,
                               builder: (context) {
-                               return buildDialog(context, snapshot, index);
+                                return buildDialog(context, snapshot, index);
                               });
                           if (dialogShowCompleted) {
                             var resultText = result == 1
@@ -190,18 +203,16 @@ class _ClientsListPageState extends State<ClientsListPage> {
     );
   }
 
-  Widget buildDialog(BuildContext context,AsyncSnapshot<List<Client>> snapshot, int index){
+  Widget buildDialog(
+      BuildContext context, AsyncSnapshot<List<Client>> snapshot, int index) {
     return AlertDialog(
-      title: Text(
-          "Delete ${snapshot.data[index].name}?"),
-      content: Text(
-          "Are you sure you want to delete this item?"),
+      title: Text("Delete ${snapshot.data[index].name}?"),
+      content: Text("Are you sure you want to delete this item?"),
       actions: [
         MaterialButton(
             child: Text("OK"),
             onPressed: () async {
-              result = await Client.deleteClient(
-                  snapshot.data[index].id);
+              result = await Client.deleteClient(snapshot.data[index].id);
               print("Result:$result");
               Navigator.pop(context, true);
               setState(() {});

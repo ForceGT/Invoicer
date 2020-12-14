@@ -53,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: (){
               _openTandCPage(context);
             },
-            leading: Icon(Icons.shopping_cart, color: Colors.white,size: 30,),
+            leading: Icon(Icons.analytics_outlined, color: Colors.white,size: 30,),
             title: Text("Terms And Conditions", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
             subtitle: Text("Click here to manage the terms and conditions displayed ", style: TextStyle(color:Colors.white70,fontWeight: FontWeight.w400),),
           ),

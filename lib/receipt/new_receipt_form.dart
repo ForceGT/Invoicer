@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:mr_invoice/receiptbuilder.dart';
+import 'package:mr_invoice/common/selectable_invoice_list.dart';
 import 'models/reciept.dart';
 import 'models/client.dart';
 
@@ -15,14 +14,11 @@ class NewReceiptForm extends StatefulWidget {
 }
 
 class _NewReceiptFormState extends State<NewReceiptForm> {
-
-
   final _clientController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var clientName = "";
   var amount;
   String _currentDate = DateFormat("dd-MM-yyyy").format(DateTime.now());
-
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +35,16 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                   children: [
                     Text(
                       "RCPT ${snapshot.data}",
-                      style: TextStyle(color: Colors.white,
+                      style: TextStyle(
+                          color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
-                      child: Text("$_currentDate",
-                        style: TextStyle(color: Colors.white, fontSize: 18),),
+                      child: Text(
+                        "$_currentDate",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
                       onTap: () async {
                         final selectedDate = await showDatePicker(
                             context: context,
@@ -53,8 +52,8 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2025));
                         setState(() {
-                          _currentDate = DateFormat("yyyy-MM-dd").format(
-                              selectedDate);
+                          _currentDate =
+                              DateFormat("yyyy-MM-dd").format(selectedDate);
                         });
                       },
                     )
@@ -69,14 +68,16 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: TypeAheadFormField(
                         textFieldConfiguration: TextFieldConfiguration(
+                            style: TextStyle(color: Colors.white),
                             autofocus: false,
                             autocorrect: true,
                             controller: _clientController,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0)
-                                ),
+                                    borderRadius: BorderRadius.circular(8.0)),
                                 labelText: "Client Name",
+                                labelStyle: TextStyle(color: Colors.grey),
+                                hintStyle: TextStyle(color: Colors.grey),
                                 hintText: "Enter your Client Name Here")),
                         itemBuilder: (context, suggestion) {
                           return ListTile(
@@ -86,14 +87,17 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                         },
                         noItemsFoundBuilder: (context) {
                           return ListTile(
-                            title:Text("No items found",
-                            style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontSize: 18,
-                                color: Theme
-                                    .of(context)
-                                    .errorColor),
-                          ));
+                              leading: Icon(
+                                Icons.clear,
+                                color: Theme.of(context).errorColor,
+                              ),
+                              title: Text(
+                                "No items found",
+                                style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 18,
+                                    color: Theme.of(context).errorColor),
+                              ));
                         },
                         suggestionsBoxDecoration: SuggestionsBoxDecoration(
                             color: Colors.blueGrey[300],
@@ -103,8 +107,8 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                                 topLeft: Radius.circular(8.0),
                                 bottomRight: Radius.circular(16.0),
                                 bottomLeft: Radius.circular(16.0))),
-                        transitionBuilder: (context, suggestionsBox,
-                            controller) {
+                        transitionBuilder:
+                            (context, suggestionsBox, controller) {
                           controller.duration = Duration(milliseconds: 100);
                           return SizeTransition(
                             child: suggestionsBox,
@@ -118,13 +122,11 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                         onSuggestionSelected: (suggestion) {
                           this._clientController.text = suggestion;
                         },
-                        suggestionsCallback: (pattern) async{
-                          if(pattern!=""){
+                        suggestionsCallback: (pattern) async {
+                          if (pattern != "") {
                             return await Client.getClientsByPattern(pattern);
                           }
-
                         },
-
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Client Name cannot be empty";
@@ -142,11 +144,13 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0)
-                            ),
+                                borderRadius: BorderRadius.circular(8.0)),
                             labelText: "Amount in Rs",
+                            labelStyle: TextStyle(color: Colors.grey),
+                            hintStyle: TextStyle(color: Colors.grey),
                             hintText: "Enter the receipt amount here"),
                         keyboardType: TextInputType.number,
                         validator: (value) {
@@ -160,47 +164,81 @@ class _NewReceiptFormState extends State<NewReceiptForm> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(
+                      height: 20,
+                    ),
                   ],
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0)),
-                  padding: EdgeInsets.all(14.0),
-                  onPressed: () async{
-                    if (_formKey.currentState.validate()) {
-                      //_formKey.currentState.save();
-                      var receipt = Receipt(fromName: clientName,
-                          amount: amount,
-                          date: _currentDate);
-                      Receipt.insertReceipt(receipt);
-                      var newReceipt = await Receipt.getReceiptById(snapshot.data);
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) {
-                            return getPdfPreview(MediaQuery
-                                .of(context)
-                                .size
-                                .width * 1.5, MediaQuery
-                                .of(context)
-                                .size
-                                .height * 0.45, newReceipt);
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 20),
+                    child: RaisedButton(
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0)),
+                      padding: EdgeInsets.all(14.0),
+                      onPressed: () async {
+                        if (_formKey.currentState.validate()) {
+                          _formKey.currentState.save();
+                          var receipt = Receipt(
+                              fromName: clientName,
+                              amount: amount,
+                              forInvoiceId: "",
+                              date: _currentDate);
+                          var result = await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return buildOptionDialog(context);
+                              });
+                          if (result) {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return SelectableInvoiceList(receipt: receipt);
+                            }));
+                          } else {
+                            ReceiptBuilder receiptBuilder = ReceiptBuilder(
+                                regenerate: false, receipt: receipt);
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return receiptBuilder.getPdfPreview(
+                                  MediaQuery.of(context).size.width*1.5,
+                                  MediaQuery.of(context).size.height * 0.45);
+                            }));
                           }
-                      )
-                      );
-                    }
-                    setState(() {
 
-                    });
-                  },
-                  child: Text("Save Form"),
-                ),
+                        }
+                      },
+                      child: Text("PROCEED"),
+                    ),
+                  ),
+                ],
               )
             ],
           );
-        }
+        });
+  }
+
+  Widget buildOptionDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text("Against Invoice"),
+      content: Text("Do you want to associate this receipt with an invoice?"),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      actions: [
+        MaterialButton(
+            child: Text("YES"),
+            onPressed: () {
+              Navigator.pop(context, true);
+            }),
+        MaterialButton(
+            child: Text("NO"),
+            onPressed: () {
+              Navigator.pop(context, false);
+            })
+      ],
     );
   }
 }

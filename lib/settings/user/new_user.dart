@@ -43,25 +43,28 @@ class _NewUserState extends State<NewUser> {
   @override
   void initState() {
     // TODO: implement initState
-    _signImage =
-        widget._isEdit == true ? File(widget._user.signImagePath) : null;
-    _logoImage =
-        widget._isEdit == true ? File(widget._user.logoImagePath) : null;
     super.initState();
+
+    _signImage =
+    widget._isEdit == true ? File(widget._user.signImagePath) : null;
+    _logoImage =
+    widget._isEdit == true ? File(widget._user.logoImagePath) : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    if(_user != null){
-    tempUser["Componey"] = _user.companyName;
-    tempUser["phone"] =  _user.phoneNo;
-    tempUser["Email"] = _user.email;
-    tempUser["address"] = _user.address;
-    tempUser["username"] = _user.userName;
-    //logoImagePath: _logoImage.path
-    tempUser["website"] = _user.website;
-   // signImagePath: _signImage.path
-}
+
+
+    if (_user != null) {
+      tempUser["Company"] = _user.companyName;
+      tempUser["phone"] = _user.phoneNo;
+      tempUser["Email"] = _user.email;
+      tempUser["address"] = _user.address;
+      tempUser["username"] = _user.userName;
+      //logoImagePath: _logoImage.path
+      tempUser["website"] = _user.website;
+      // signImagePath: _signImage.path
+    }
     _drawSignature(BuildContext context) async {
       showDialog(
         context: context,
@@ -84,12 +87,16 @@ class _NewUserState extends State<NewUser> {
                         onPressed: () async {
                           if (_signController.isNotEmpty) {
                             var data = await _signController.toPngBytes();
-                            Directory directory = await getExternalStorageDirectory();
-                            File('${directory.path}/signedImage.png').writeAsBytesSync(data.buffer.asInt8List());
-                            var file =await File("${directory.path}/signedImage.png");
+                            Directory directory = Platform.isAndroid
+                                ? await getExternalStorageDirectory()
+                                : await getApplicationDocumentsDirectory();
+                            File('${directory.path}/signedImage.png')
+                                .writeAsBytesSync(data.buffer.asInt8List());
+                            var file =
+                                await File("${directory.path}/signedImage.png");
                             setState(() {
                               _signImage = file;
-                              print("_signImage" + "${_signImage.path}");
+                              //print("_signImage" + "${_signImage.path}");
                             });
                           }
                           Navigator.pop(context);
@@ -113,7 +120,7 @@ class _NewUserState extends State<NewUser> {
     }
 
     _showImagePicker(BuildContext context, String type) async {
-      print(_user);
+      //print(_user);
 
       var pickedImage = await ImagePicker()
           .getImage(source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
@@ -138,6 +145,7 @@ class _NewUserState extends State<NewUser> {
                   padding: const EdgeInsets.all(8.0),
                   child: Column(children: [
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       initialValue: tempUser.containsKey("username")
                           ? tempUser["username"]
                           : "",
@@ -146,8 +154,14 @@ class _NewUserState extends State<NewUser> {
                       },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(24.0)),
+                              borderSide: BorderSide(
+                                color: Colors.blue
+                              ),
+                              borderRadius: BorderRadius.circular(24.0)
+                          ),
                           labelText: "Username",
+                          fillColor: Colors.white,
+                          hintStyle: TextStyle(color: Colors.grey),
                           hintText: "Enter your name"),
                       validator: (value) {
                         if (value.isEmpty) {
@@ -160,16 +174,19 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       onChanged: (String data) {
-                        tempUser["Componey"] = data;
+                        tempUser["Company"] = data;
                       },
-                      initialValue: tempUser.containsKey("Componey")
-                          ? tempUser["Componey"]
+                      initialValue: tempUser.containsKey("Company")
+                          ? tempUser["Company"]
                           : "",
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
                           labelText: "Company",
+                          fillColor: Colors.white,
+                          hintStyle: TextStyle(color: Colors.grey),
                           hintText: "Enter your company name"),
                       validator: (value) {
                         if (value.isEmpty) {
@@ -182,6 +199,7 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       keyboardType: TextInputType.emailAddress,
                       initialValue: tempUser.containsKey("Email")
                           ? tempUser["Email"]
@@ -193,6 +211,7 @@ class _NewUserState extends State<NewUser> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
                           labelText: "Email",
+                          hintStyle: TextStyle(color: Colors.grey),
                           hintText: "Enter your email address"),
                       validator: (value) {
                         if (value.isEmpty) {
@@ -207,6 +226,7 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       initialValue: tempUser.containsKey("phone")
                           ? tempUser["phone"]
                           : "",
@@ -217,7 +237,9 @@ class _NewUserState extends State<NewUser> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
                           labelText: "Phone number",
-                          hintText: "Enter the phone number"),
+                          hintText: "Enter the phone number",
+                          hintStyle: TextStyle(color: Colors.grey)
+                      ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value.isEmpty) {
@@ -230,6 +252,7 @@ class _NewUserState extends State<NewUser> {
                       height: 10,
                     ),
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       initialValue: tempUser.containsKey("website")
                           ? tempUser["website"]
                           : "",
@@ -240,12 +263,14 @@ class _NewUserState extends State<NewUser> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
                           labelText: "Website",
-                          hintText: "Enter your website address"),
+                          hintText: "Enter your website address",hintStyle: TextStyle(color: Colors.grey)),
+
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     TextFormField(
+                      style: TextStyle(color: Colors.white),
                       initialValue: tempUser.containsKey("address")
                           ? tempUser["address"]
                           : "",
@@ -256,6 +281,7 @@ class _NewUserState extends State<NewUser> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(24.0)),
                           labelText: "Address ",
+                          hintStyle: TextStyle(color: Colors.grey),
                           hintText: "Enter the your address"),
                       keyboardType: TextInputType.multiline,
                       maxLines: 2,
@@ -273,7 +299,7 @@ class _NewUserState extends State<NewUser> {
                       children: [
                         Text(
                           "Logo Image",
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 18,color: Colors.white),
                         ),
                         SizedBox(
                           height: 10,
@@ -281,12 +307,11 @@ class _NewUserState extends State<NewUser> {
                         _isEdit == true
                             ? Container(
                                 color: Colors.blueGrey,
-                                height: 300,
+                                height: 200,
                                 child: Column(
                                   children: [
-                                    ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(24.0),
+                                    CircleAvatar(
+                                        radius: 60.0,
                                         child: Image.file(
                                           File(_user.logoImagePath),
                                           fit: BoxFit.cover,
@@ -303,18 +328,15 @@ class _NewUserState extends State<NewUser> {
                                 ),
                               )
                             : Container(
-                                color: Colors.blueGrey,
                                 alignment: Alignment.center,
-                                height: 300,
+                                height: 200,
                                 child: _logoImage != null
                                     ? Column(
                                         children: [
-                                          ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(24.0),
+                                          CircleAvatar(
                                               child: Image.file(
-                                                _logoImage,
-                                              )),
+                                            _logoImage,
+                                          )),
                                           SizedBox(
                                             height: 10,
                                           ),
@@ -341,7 +363,7 @@ class _NewUserState extends State<NewUser> {
                       children: [
                         Text(
                           "Sign Image",
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 18,color: Colors.white),
                         ),
                         SizedBox(
                           height: 10,
@@ -357,57 +379,20 @@ class _NewUserState extends State<NewUser> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      GestureDetector(
-                                        child: RaisedButton(
-                                          onPressed: () =>
-                                              _showImagePicker(context, "sign"),
-                                          child:
-                                              Text("Edit picked image again"),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      GestureDetector(
-                                        child: RaisedButton(
-                                          onPressed: () => _drawSignature(bc),
-                                          child: Text("Draw sign again"),
-                                        ),
-                                      ),
-                                    ],
-                                  )
+                                  RaisedButton(
+                                    onPressed: () => _drawSignature(bc),
+                                    child: Text("Draw sign again"),
+                                  ),
                                 ],
                               )
                             : Container(
+                                alignment: Alignment.center,
                                 color: Colors.blueGrey,
-                                height: 300,
+                                height: 200,
                                 child: _signImage == null
-                                    ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GestureDetector(
-                                            child: RaisedButton(
-                                              onPressed: () => _showImagePicker(
-                                                  context, "sign"),
-                                              child: Text("Pick an Image"),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          GestureDetector(
-                                            child: RaisedButton(
-                                              onPressed: () =>
-                                                  _drawSignature(bc),
-                                              child: Text("Draw a sign"),
-                                            ),
-                                          ),
-                                        ],
+                                    ? RaisedButton(
+                                        onPressed: () => _drawSignature(bc),
+                                        child: Text("Draw a sign"),
                                       )
                                     : Column(
                                         children: [
@@ -418,32 +403,10 @@ class _NewUserState extends State<NewUser> {
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              GestureDetector(
-                                                child: RaisedButton(
-                                                  onPressed: () =>
-                                                      _showImagePicker(
-                                                          context, "sign"),
-                                                  child: Text(
-                                                      "Pick from gallery again"),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              GestureDetector(
-                                                child: RaisedButton(
-                                                  onPressed: () =>
-                                                      _drawSignature(bc),
-                                                  child:
-                                                      Text("Draw sign again"),
-                                                ),
-                                              ),
-                                            ],
-                                          )
+                                          RaisedButton(
+                                            onPressed: () => _drawSignature(bc),
+                                            child: Text("Draw sign again"),
+                                          ),
                                         ],
                                       ),
                               ),
@@ -468,10 +431,10 @@ class _NewUserState extends State<NewUser> {
                                 Scaffold.of(bc).showSnackBar(snackbar);
                                 return;
                               }
-                              print("Address:" + tempUser["address"]);
+                              //print("Address:" + tempUser["address"]);
 
                               User user = User(
-                                companyName: tempUser["Componey"],
+                                companyName: tempUser["Company"],
                                 phoneNo: tempUser["phone"],
                                 email: tempUser["Email"],
                                 address: tempUser["address"],

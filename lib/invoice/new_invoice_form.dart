@@ -96,14 +96,18 @@ class _NewInvoiceFormState extends State<NewInvoiceForm>
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TypeAheadField(
+
                 textFieldConfiguration: TextFieldConfiguration(
+                  style: TextStyle(color: Colors.white),
                   autofocus: false,
                   controller: _clientNameController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0)),
                       labelText: "Client Name",
-                      hintText: "Client Name"),
+                      hintStyle: TextStyle(color: Colors.grey),
+                      hintText: "Client Name"
+                  ),
                 ),
                 itemBuilder: (context, suggestion) {
                   return ListTile(
@@ -177,7 +181,7 @@ class _NewInvoiceFormState extends State<NewInvoiceForm>
                           return ;
                         }
                         Navigator.push(context, MaterialPageRoute(builder: (context){
-                          Invoice invoice = Invoice(id: snapshot.data,date: _currentDate,forName: _clientNameController.text);
+                          Invoice invoice = Invoice(date: _currentDate,forName: _clientNameController.text);
                           return ServiceListPage(isSelectable: true,invoice: invoice,);
                         }));
                       },

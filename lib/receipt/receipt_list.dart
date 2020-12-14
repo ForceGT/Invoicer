@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:mr_invoice/list_search.dart';
+import 'package:mr_invoice/common/list_search.dart';
 import 'package:mr_invoice/models/reciept.dart';
 import 'package:mr_invoice/widgets/receipt_list_item.dart';
 
@@ -24,9 +24,7 @@ class _ReceiptListState extends State<ReceiptList> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
       return Scaffold(
-        backgroundColor: Colors.grey[900],
         appBar: AppBar(
-          backgroundColor: Colors.orange,
           leading: IconButton(
             color: Colors.white,
               icon: Icon(Icons.arrow_back_ios),
@@ -38,7 +36,7 @@ class _ReceiptListState extends State<ReceiptList> {
               color: Colors.white,
               disabledColor: Colors.white,
               onPressed: () {
-                showSearch(context: context, delegate: ListSearch());
+                showSearch(context: context, delegate: ListSearch(type: "receipt"));
               },
             ),
             PopupMenuButton<SearchOptions>(
@@ -76,24 +74,21 @@ class _ReceiptListState extends State<ReceiptList> {
       return FutureBuilder(
         future: Receipt.getAllReceipts(),
         builder: (BuildContext context,AsyncSnapshot<List<Receipt>> snapshot){
-          if(snapshot.hasData){
-            if(snapshot.connectionState == ConnectionState.active){
-              return CircularProgressIndicator();
-            }
-            if(snapshot.connectionState == ConnectionState.done){
-              return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder:(context,index){
-                    return ReceiptListItem(snapshot.data[index]);
-                  }
-              );
-            }
-          }
-          else{
-            return Center(
-              child: Text("No Receipts Added Yet", style: TextStyle(color: Colors.white, fontSize: 18),),
-            );
-          }
+              if(!snapshot.hasData||snapshot.data.isEmpty ){
+                return Center(
+                  child: Text("No Receipts Added Yet", style: TextStyle(color: Colors.white, fontSize: 18),),
+                );
+              }
+              else{
+                return ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder:(context,index){
+                      return ReceiptListItem(snapshot.data[index]);
+                    }
+                );
+              }
+
+
 
         },
       );
