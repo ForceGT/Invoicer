@@ -30,10 +30,12 @@ Flutter - 2.5.1
 
 ### Android
 
-<p float="left">
-  <img src="static/android/1.png" width="100" />
-  <img src="static/android/2.png" width="100" />
-  <img src="static/android/3.png" width="100" />
-</p>
+<table>
+<tr>
+    <td><img src="static/android/1.png" width=270 height=480></td>
+    <td><img src="static/android/2.png" width=270 height=480></td>
+    <td><img src="static/android/3.png" width=270 height=480></td>
+  </tr>
+</table>
 
 
