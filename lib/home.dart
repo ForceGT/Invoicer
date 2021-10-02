@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:mr_invoice/invoice_list.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:mr_invoice/invoice/invoice_list.dart';
 import 'package:mr_invoice/invoicewithpreview.dart';
-import 'package:mr_invoice/receipt_list.dart';
+import 'package:mr_invoice/models/user.dart';
+import 'package:mr_invoice/receipt/receipt_list.dart';
 import 'package:mr_invoice/receiptwithpreview.dart';
-import 'package:mr_invoice/settings.dart';
+import 'package:mr_invoice/settings/settings.dart';
 import 'package:mr_invoice/widgets/top_curve.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,13 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
 
-  AnimationController _moneyBagSlideController;
-  AnimationController _userNameHelloFadeIn;
-  AnimationController _usernameFadeIn;
+  late AnimationController _moneyBagSlideController;
+  late AnimationController _userNameHelloFadeIn;
+  late AnimationController _usernameFadeIn;
 
-  Animation<Offset> _moneyBagSlideAnimation;
-  Animation<double> _helloFadeInAnimation;
-  Animation<double> _usernameFadeInAnimation;
+  late Animation<Offset> _moneyBagSlideAnimation;
+  late Animation<double> _helloFadeInAnimation;
+  late Animation<double> _usernameFadeInAnimation;
 
   @override
   void initState() {
@@ -92,9 +94,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                         ),
                         FadeTransition(
                           opacity: _usernameFadeInAnimation,
-                          child: Text(
-                            "Username",
-                            style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 24),
+                          child: FutureBuilder(
+                            future: User.getUserFromDatabase(),
+                            builder:(context,AsyncSnapshot<User> snapshot){
+                              if(snapshot.data == null){
+                                return Text(
+                                  "Welcome to Mr.Invoice",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 24),
+                                );
+                              }
+                              else{
+                                return Text("${snapshot.data!.userName.split(" ")[0]}",style: TextStyle(color: Colors.white,decoration: TextDecoration.none,fontSize: 24),);
+                              }
+
+                          }
                           ),
                         )
                       ],
@@ -105,7 +119,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                         alignment: Alignment.topRight,
                         child: IconButton(
                           icon: Icon(Icons.settings),
-                          color: Color(0xFFffe4e4),
+
+                          color: Color(0xFFffe0a3),
                           onPressed: () {
                             _openSettings(context);
                           },),
@@ -116,7 +131,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                 SizedBox(
                   height: screenHeight * 0.28,
                 ),
-                InkWell(
+                GestureDetector(
+
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context){
@@ -130,7 +146,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
                 SizedBox(
                   height: screenHeight*0.1,
                 ),
-                InkWell(
+                GestureDetector(
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context){
@@ -147,23 +163,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
         ]),
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
-        overlayColor: Colors.grey[600],
-          curve: Curves.easeInOut,
-          overlayOpacity: 0.5,
+        overlayColor: Color(0xFF2d4059),
+          curve: Curves.easeIn,
+          overlayOpacity: 0.7,
+        animationSpeed: 50,
         tooltip: 'Speed Dial',
         children: [
           SpeedDialChild(
-              child: Icon(Icons.receipt),
-              backgroundColor: Colors.red,
+              child: Icon(MdiIcons.note),
+              backgroundColor: Colors.blueGrey,
               label: 'New Estimate',
               labelStyle: TextStyle(fontSize: 12.0),
               onTap: (){
-                _createNewReceipt(context);
+                _createNewInvoice(context,true);
               }
           ),
           SpeedDialChild(
-            child: Icon(Icons.redeem),
-            backgroundColor: Colors.red,
+            child: Icon(Icons.receipt_long),
+            backgroundColor: Color(0xFFf67280),
             label: 'New Receipt',
             labelStyle: TextStyle(fontSize: 12.0),
             onTap: (){
@@ -171,12 +188,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
             }
           ),
           SpeedDialChild(
-              child: Icon(Icons.account_balance_wallet),
-              backgroundColor: Colors.deepOrangeAccent,
+              child: Icon(MdiIcons.currencyInr),
+              backgroundColor: Color(0xFF005792),
               label: 'New Invoice',
               labelStyle: TextStyle(fontSize: 12.0),
             onTap: (){
-                _createNewInvoice(context);
+                _createNewInvoice(context,false);
             }
           )
         ],
@@ -203,10 +220,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   }
 }
 
-  void _createNewInvoice(BuildContext context) {
+  void _createNewInvoice(BuildContext context, bool isEstimate) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context){
-        return InvoiceWithPreview();
+        return InvoiceWithPreview(isEstimate: isEstimate,);
       }
     ));
 }

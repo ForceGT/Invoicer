@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mr_invoice/models/TandC.dart';
 import 'package:mr_invoice/models/client.dart';
 import 'package:mr_invoice/models/service.dart';
@@ -9,49 +8,56 @@ import 'package:mr_invoice/models/user.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'models/invoice.dart';
+import '../models/invoice.dart';
 
-
-
-class InvoiceBuilder{
-
+class InvoiceBuilder {
   bool _regenerate;
 
-   List<Service> services;
-   Client client;
-   List<TandC> terms;
-   User user;
-   Invoice _invoice;
-   int invId;
+  late List<Service> services;
+  late Client client;
+  late List<TandC> terms;
+  late User user;
+  late Invoice _invoice;
+  late int invId;
+  late bool _isEstimate;
 
+  InvoiceBuilder({regenerate, invoice, isEstimate})
+      : _regenerate = regenerate,
+        _invoice = invoice,
+        _isEstimate = isEstimate;
 
-  InvoiceBuilder({regenerate,invoice}):_regenerate=regenerate,_invoice=invoice;
+  Widget getInvoicePdfPreview() {
+    print("Invoice Builder Estimate $_isEstimate");
 
-
-  bool get regenerate => _regenerate;
-
-   Widget getInvoicePdfPreview() {
     return PdfPreview(
-        pdfFileName: "Invoice_${_invoice.date}",
+        pdfFileName: (_isEstimate == true)
+            ? "Estimate_${_invoice.date}.pdf"
+            : "Invoice_${_invoice.date}.pdf",
         allowPrinting: false,
         canChangePageFormat: false,
+        actions: [
+          PdfPreviewAction(
+              icon: Icon(Icons.done),
+              onPressed: (context, _, __) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              })
+        ],
         maxPageWidth: 700,
         build: (pageFormat) {
           return buildInvoicePdf(pageFormat);
         });
   }
 
-  Future<Uint8List> buildInvoicePdf(
-      PdfPageFormat pageFormat) async {
-
-
+  Future<Uint8List> buildInvoicePdf(PdfPageFormat pageFormat) async {
     client = await getClientDetails(this._invoice.forName);
     services = await Service.getServiceFromIds(this._invoice.listofProductIds);
     terms = await TandC.getTermsByIds(this._invoice.tAndCId);
     user = await User.getUserFromDatabase();
-    invId = await Invoice.getLatestId()-1;
-    if(!regenerate)
+    invId = _invoice == null ? await Invoice.getLatestId() : _invoice.id!;
+    if (!_regenerate) {
       Invoice.insertInvoice(this._invoice);
+    }
+
     final doc = pw.Document();
     doc.addPage(pw.MultiPage(
         margin: pw.EdgeInsets.all(10.0),
@@ -70,9 +76,10 @@ class InvoiceBuilder{
 
   pw.Widget _buildHeader(pw.Context context) {
     return pw.Padding(
-      padding: pw.EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
+      padding:
+          pw.EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
       child:
-      pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+          pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
         pw.Row(
             mainAxisSize: pw.MainAxisSize.min,
             mainAxisAlignment: pw.MainAxisAlignment.end,
@@ -89,12 +96,14 @@ class InvoiceBuilder{
                     pw.Text(user.companyName == null
                         ? "Company Name"
                         : "${user.companyName}"),
-                    pw.Text(user.address == null ? "Address" : "${user.address}",
-                        maxLines: 2, textAlign: pw.TextAlign.justify),
+                    pw.Text(
+                        user.address == null ? "Address" : "${user.address}",
+                        maxLines: 2,
+                        textAlign: pw.TextAlign.justify),
                     pw.Text(user.email == null ? "Email" : "${user.email}"),
                     pw.Text(
                         user.phoneNo == null ? "Phone No" : "${user.phoneNo}"),
-                    if(user.website != null) pw.Text( "${user.website}"),
+                    if (user.website != null) pw.Text("${user.website}"),
                   ]),
             ]),
         pw.Divider(),
@@ -105,41 +114,36 @@ class InvoiceBuilder{
 
   pw.Widget _buildInvoiceContent(pw.Context context) {
     return pw.Stack(children: [
-
       pw.Container(
           height: 700,
           alignment: pw.Alignment.center,
-
-          child:pw.Opacity(
+          child: pw.Opacity(
               opacity: 0.30,
               child: pw.Container(
-                  width: 200,height: 200,
+                  width: 200,
+                  height: 200,
                   decoration: pw.BoxDecoration(
                     shape: pw.BoxShape.circle,
-
                   ),
                   child: pw.Image(
-                      PdfImage.file(context.document,
-                          bytes: File(user.logoImagePath).readAsBytesSync()),
-                      fit: pw.BoxFit.contain)
-              )
-          )
+                      pw.MemoryImage(
+                          File(user.logoImagePath).readAsBytesSync()),
+                      fit: pw.BoxFit.contain)))
 
-        // decoration: pw.BoxDecoration(
-        //   image: pw.DecorationImage(
-        //     fit: pw.BoxFit.cover,
-        //     image: PdfImage.file(context.document, bytes: File(user.logoImagePath).readAsBytesSync(),
-        //     )
-        //   )
-      ),
-
+          // decoration: pw.BoxDecoration(
+          //   image: pw.DecorationImage(
+          //     fit: pw.BoxFit.cover,
+          //     image: PdfImage.file(context.document, bytes: File(user.logoImagePath).readAsBytesSync(),
+          //     )
+          //   )
+          ),
       pw.Padding(
           padding: pw.EdgeInsets.all(8.0),
           child: pw.Column(
             children: [
               pw.Container(
                   alignment: pw.Alignment.center,
-                  child: pw.Text("INVOICE",
+                  child: pw.Text(this._isEstimate ? "ESTIMATE" : "INVOICE",
                       style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold, fontSize: 24))),
               pw.Row(
@@ -149,9 +153,11 @@ class InvoiceBuilder{
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.SizedBox(height: 30),
-                          pw.Text("Invoice To",
+                          pw.Text(
+                              this._isEstimate ? "Estimate To" : "Invoice To",
                               style: pw.TextStyle(
-                                  fontSize: 22, fontWeight: pw.FontWeight.bold)),
+                                  fontSize: 22,
+                                  fontWeight: pw.FontWeight.bold)),
                           pw.Text(
                               client.name == null
                                   ? "Customer Name"
@@ -170,11 +176,14 @@ class InvoiceBuilder{
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                              invId == null
-                                  ? "Invoice Number"
-                                  : "INV $invId",
+                              this._isEstimate
+                                  ? "Estimate"
+                                  : invId == null
+                                      ? "Invoice Number"
+                                      : "INV $invId",
                               style: pw.TextStyle(
-                                  fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                                  fontSize: 20,
+                                  fontWeight: pw.FontWeight.bold)),
                           pw.Text(
                               this._invoice.date == null
                                   ? "Date Of Invoice"
@@ -197,8 +206,9 @@ class InvoiceBuilder{
       pw.Table.fromTextArray(
           border: pw.TableBorder(),
           cellAlignment: pw.Alignment.centerLeft,
-          headerDecoration:
-          pw.BoxDecoration(borderRadius: 2, color: PdfColors.blue),
+          headerDecoration: pw.BoxDecoration(
+              borderRadius: pw.BorderRadius.circular(2.0),
+              color: PdfColors.blue),
           headerHeight: 25,
           cellHeight: 40,
           headerStyle: pw.TextStyle(
@@ -209,14 +219,16 @@ class InvoiceBuilder{
             2: pw.Alignment.center,
           },
           rowDecoration: pw.BoxDecoration(
-              border: pw.BoxBorder(
-                bottom: true,
-              )),
+              border: pw.Border(
+            bottom: pw.BorderSide(
+              width: .5,
+            ),
+          )),
           headers: List<String>.generate(
               tableHeaders.length, (index) => tableHeaders[index]),
           data: List<List<String>>.generate(
               services.length,
-                  (row) => List<String>.generate(
+              (row) => List<String>.generate(
                   tableHeaders.length, (col) => services[row].getIndex(col)))),
       pw.SizedBox(height: 20),
       pw.Row(children: [
@@ -225,15 +237,17 @@ class InvoiceBuilder{
             flex: 1,
             child: pw.Row(children: [
               pw.Text("Grand Total:",
-                  style:
-                  pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  style: pw.TextStyle(
+                      fontSize: 20, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(width: 40),
               pw.Container(
                   padding: pw.EdgeInsets.all(16.0),
                   color: PdfColors.blue,
                   alignment: pw.Alignment.centerRight,
                   child: pw.Text(
-                      this._invoice.amount == null ? "Amount" : "${this._invoice.amount}",
+                      this._invoice.amount == null
+                          ? "Amount"
+                          : "${this._invoice.amount}",
                       style: pw.TextStyle(
                           fontSize: 20, fontWeight: pw.FontWeight.bold))),
             ]))
@@ -252,9 +266,8 @@ class InvoiceBuilder{
               children: [
                 pw.Container(
                   decoration: pw.BoxDecoration(
-                    border: pw.BoxBorder(
-                      top: true,
-                      color: PdfColors.blue,
+                    border: pw.Border(
+                      top: pw.BorderSide(color: PdfColors.blue),
                     ),
                   ),
                   padding: const pw.EdgeInsets.only(top: 10, bottom: 4),
@@ -295,22 +308,15 @@ class InvoiceBuilder{
         pw.Expanded(flex: 2, child: pw.SizedBox()),
         pw.Expanded(
             child: pw.Column(children: [
-              pw.Container(
-                  width: 150,
-                  height: 50,
-                  child: user.signImagePath == null
-                      ? pw.Text("Signature")
-                      : pw.Image(
-                      PdfImage.file(context.document,
-                          bytes: File(user.signImagePath).readAsBytesSync()),
-                      fit: pw.BoxFit.fill)),
-              user.userName == null
-                  ? pw.Text("Sender Name")
-                  : pw.Text("${user.userName}"),
-              user.companyName == null
-                  ? pw.Text("Company Name")
-                  : pw.Text("${user.companyName}")
-            ]))
+          pw.Container(
+              width: 150,
+              height: 50,
+              child: pw.Image(
+                  pw.MemoryImage(File(user.signImagePath).readAsBytesSync()),
+                  fit: pw.BoxFit.fill)),
+          pw.Text("${user.userName}"),
+          pw.Text("${user.companyName}")
+        ]))
       ])
     ]);
   }
@@ -321,5 +327,3 @@ class InvoiceBuilder{
 //   ]);
 // }
 }
-
-

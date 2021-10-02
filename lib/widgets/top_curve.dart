@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mr_invoice/colors.dart';
+import 'package:mr_invoice/common/colors.dart';
+//ignore: must_be_immutable
 class TopCurve extends StatelessWidget {
 
   var headerHeight;

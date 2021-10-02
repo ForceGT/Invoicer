@@ -1,7 +1,7 @@
 import 'package:mr_invoice/database/db_helper.dart';
 
 class Invoice {
-  int _id;
+  int? _id;
   int _amount;
   String _note;
   String _tAndCId;
@@ -11,6 +11,13 @@ class Invoice {
   String _forName;
   String _date;
   int _forReceiptId;
+  bool _isSelected = false;
+
+  bool get isSelected => _isSelected;
+
+  set isSelected(bool value) {
+    _isSelected = value;
+  }
 
   String _listofProductIds;
 
@@ -36,7 +43,6 @@ class Invoice {
 
   String get forName => _forName;
 
-
   String get listofProductIds => _listofProductIds;
 
   String get tAndCId => _tAndCId;
@@ -45,7 +51,7 @@ class Invoice {
 
   int get amount => _amount;
 
-  int get id => _id;
+  int? get id => _id;
 
   int get forReceiptId => _forReceiptId;
 
@@ -73,7 +79,6 @@ class Invoice {
     _listofProductIds = value;
   }
 
-
   set amount(int value) {
     _amount = value;
   }
@@ -91,14 +96,14 @@ class Invoice {
 
   factory Invoice.fromMap(Map<String, dynamic> data) {
     return Invoice(
-        id:data["id"],
-        amount:data["amount"],
-        note:data["note"],
-        tAndCId:data["tAndCId"],
-        listOfProductIds:data["listOfProducts"],
-        forName:data["forName"],
-        date:data["date"],
-        forReceiptId:data["forReceiptId"]);
+        id: data["id"],
+        amount: data["amount"],
+        note: data["note"],
+        tAndCId: data["tAndCId"],
+        listOfProductIds: data["listOfProducts"],
+        forName: data["forName"],
+        date: data["date"],
+        forReceiptId: data["forReceiptId"]);
   }
 
   Map<String, dynamic> toMap() => {
@@ -112,16 +117,18 @@ class Invoice {
         "forReceiptId": _forReceiptId
       };
 
-
-
-  static Future<int> getLatestId() async{
+  static Future<int> getLatestId() async {
     final db = await DBHelper.db.database;
     var latestId =
         await db.rawQuery("SELECT MAX(id)+1 as last_inserted_id FROM Invoices");
     //print("latestId="+latestId.toString()+"\n");
-    return latestId.first["last_inserted_id"] == null? 1:latestId.first["last_inserted_id"];
-  }
+    if (latestId.first["last_inserted_id"] == null){
+      return 1;
+    }else{
+      return latestId.first["last_inserted_id"] as int;
+    }
 
+  }
 
   static insertInvoice(Invoice invoice) async {
     final db = await DBHelper.db.database;
@@ -130,9 +137,25 @@ class Invoice {
 
   static Future<Invoice> getInvoiceById(int id) async {
     final db = await DBHelper.db.database;
-    var results = await db.query("Invoices",where: "id=?",whereArgs: [id]);
+    var results = await db.query("Invoices", where: "id=?", whereArgs: [id]);
     return Invoice.fromMap(results.first);
   }
 
+  static Future<List<Invoice>> getAllInvoices() async {
+    final db = await DBHelper.db.database;
+    var results =
+        await db.query("Invoices", columns: Invoice.columns, orderBy: "id ASC");
+    //print("All Invoices: $results");
+    return results.map((result) => Invoice.fromMap(result)).toList();
+  }
 
+  static Future<List<Invoice>> getInvoiceByName(String name) async {
+    final db = await DBHelper.db.database;
+    var results =
+        await db.query("Invoices", where: "forName=?", whereArgs: [name]);
+
+    print("Invoice By Name : $results");
+
+    return results.map((result) => Invoice.fromMap(result)).toList();
+  }
 }

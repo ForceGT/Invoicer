@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mr_invoice/models/client.dart';
 import 'package:mr_invoice/models/invoice.dart';
 import 'package:mr_invoice/widgets/invoice_list_item.dart';
-import 'models/reciept.dart';
+import '../models/reciept.dart';
 import 'package:mr_invoice/widgets/receipt_list_item.dart';
 
 class ListSearch extends SearchDelegate<String> {
@@ -12,37 +12,52 @@ class ListSearch extends SearchDelegate<String> {
 
   String _type;
 
-
   @override
   Widget buildSuggestions(BuildContext context) {
-    if(query.isNotEmpty){
-      return FutureBuilder(future: Client.getClientsByPattern(query),
+    if (query.isNotEmpty) {
+      return FutureBuilder(
+          future: Client.getClientsByPattern(query),
           builder: (context, AsyncSnapshot<List<String>> snapshot) {
-            if(snapshot.data!=null && snapshot.data.isNotEmpty && snapshot.connectionState == ConnectionState.done){
-              return ListView.builder(itemCount: snapshot.data.length,
+            if (snapshot.data != null &&
+                snapshot.data!.isNotEmpty &&
+                snapshot.connectionState == ConnectionState.done) {
+              return ListView.builder(
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                        onTap: (){
-                          query = snapshot.data[index];
+                        onTap: () {
+                          query = snapshot.data![index];
                           showResults(context);
                         },
-                        title: Text(snapshot.data[index],style: TextStyle(color: Colors.white),
-
-                        )
-                    );
+                        title: Text(
+                          snapshot.data![index],
+                          style: TextStyle(color: Colors.white),
+                        ));
                   });
+            } else {
+              if (snapshot.data != null && snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No Items Found / Query not entered",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
             }
-            else{
-              return Center(child: Text("No Items Found / Query not entered",style: TextStyle(color: Colors.white),),);
-            }
-
-          }
+          });
+    } else {
+      return Center(
+        child: Text(
+          "Suggestions will appear here as you type",
+          style: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       );
     }
-    else{
-      return Center(child: Text("Suggestions will appear here",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),);
-    }
-
   }
 
   @override
@@ -63,7 +78,8 @@ class ListSearch extends SearchDelegate<String> {
         progress: transitionAnimation,
       ),
       onPressed: () {
-        close(context, null);
+        close(context, "");
+        //close(context, null);
       },
     );
   }
@@ -75,15 +91,14 @@ class ListSearch extends SearchDelegate<String> {
         future: Receipt.getAllReceipts(),
         builder: (context, AsyncSnapshot<List<Receipt>> snapshot) {
           return ListView.builder(
-              itemCount: snapshot.data.length,
+              itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                if (snapshot.data[index].fromName.contains(query))
-                  return ReceiptListItem(snapshot.data[index]);
+                if (snapshot.data![index].fromName.contains(query))
+                  return ReceiptListItem(snapshot.data![index]);
                 else {
                   return SizedBox.shrink();
                 }
-              }
-          );
+              });
         },
       );
     } else {
@@ -91,19 +106,16 @@ class ListSearch extends SearchDelegate<String> {
           future: Invoice.getAllInvoices(),
           builder: (context, AsyncSnapshot<List<Invoice>> snapshot) {
             return ListView.builder(
-                itemCount: snapshot.data.length,
+                itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  if (snapshot.data[index].forName.contains(query))
-                    return InvoiceListItem(snapshot.data[index]);
+                  if (snapshot.data![index].forName.contains(query))
+                    return InvoiceListItem(snapshot.data![index]);
                   else {
                     return SizedBox.shrink();
                   }
-                }
-            );
+                });
           });
     }
     // return ReceiptListItem();
   }
-
-
 }

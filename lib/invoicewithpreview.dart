@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'new_invoice_form.dart';
-import 'invoicebuilder.dart';
+import 'invoice/new_invoice_form.dart';
+
 class InvoiceWithPreview extends StatefulWidget {
   @override
   _InvoiceWithPreviewState createState() => _InvoiceWithPreviewState();
+
+  bool _isEstimate;
+  InvoiceWithPreview({isEstimate}):_isEstimate=isEstimate;
 }
 
 class _InvoiceWithPreviewState extends State<InvoiceWithPreview> {
@@ -20,16 +23,16 @@ class _InvoiceWithPreviewState extends State<InvoiceWithPreview> {
   //
   // }
 
-  Widget _getInvoiceBuilderForm(){
-    return NewInvoiceForm(isEdit: false,);
+  Widget _getInvoiceBuilderForm(bool isEstimate){
+    return NewInvoiceForm(isEstimate: isEstimate,);
   }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title:Text("Invoice Builder")),
-      body: _getInvoiceBuilderForm(),
+      appBar: AppBar(title:Text(widget._isEstimate?"Estimate Builder":"Invoice Builder")),
+      body: _getInvoiceBuilderForm(widget._isEstimate),
     );
   }
 

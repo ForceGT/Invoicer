@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mr_invoice/clients_list_page.dart';
-import 'package:mr_invoice/services_list_page.dart';
-import 'package:mr_invoice/user_profile.dart';
-import 'tandc_list_page.dart';
+import 'package:mr_invoice/settings/client/clients_list_page.dart';
+import 'package:mr_invoice/settings/services/services_list_page.dart';
+import 'package:mr_invoice/settings/user/user_profile.dart';
+import 'terms_and_conditions/tandc_list_page.dart';
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -89,7 +89,7 @@ void _openClientsPage(BuildContext context){
 void _openProductsPage(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute(
       builder: (context){
-        return ServiceListPage();
+        return ServiceListPage(isSelectable: false, invoice: null, isEstimate: false);
       }
   ));
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'models/service.dart';
+import '../../models/service.dart';
 
+//ignore: must_be_immutable
 class NewService extends StatefulWidget {
-  Service _service;
-  bool _isEdit;
+  late Service? _service;
+  late bool _isEdit;
 
   NewService({service, isEdit})
       : _service = service,
@@ -20,10 +21,10 @@ class _NewServiceState extends State<NewService> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController _nameController = widget._isEdit == true
-        ? TextEditingController(text: "${widget._service.name}")
+        ? TextEditingController(text: "${widget._service!.name}")
         : TextEditingController();
     final TextEditingController _rateController = widget._isEdit == true
-        ? TextEditingController(text: "${widget._service.rate}")
+        ? TextEditingController(text: "${widget._service!.rate}")
         : TextEditingController();
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +48,10 @@ class _NewServiceState extends State<NewService> {
             Center(
               child: Text(
                 "Service Details",
-                style: TextStyle(fontSize: 28,fontWeight: FontWeight.bold,color: Colors.white),
+                style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
             ),
             Padding(
@@ -63,21 +67,16 @@ class _NewServiceState extends State<NewService> {
                       child: ListTile(
                         dense: true,
                         contentPadding: EdgeInsets.all(10.0),
-                        leading: Icon(
-                          Icons.account_balance_wallet,
-                          size: 30,
-                            color: Colors.white
-                        ),
+                        leading: Icon(Icons.account_balance_wallet,
+                            size: 30, color: Colors.white),
                         title: TextField(
-                          style: TextStyle(fontSize: 18,color: Colors.white),
+                          style: TextStyle(fontSize: 18, color: Colors.white),
                           controller: _nameController,
                           decoration: InputDecoration(
-                            hintText: "Name of the service",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            labelText: "Service",
-                              labelStyle:
-                              TextStyle(color: Colors.grey[400])
-                          ),
+                              hintText: "Name of the service",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              labelText: "Service",
+                              labelStyle: TextStyle(color: Colors.grey[400])),
                         ),
                       ),
                     ),
@@ -93,15 +92,13 @@ class _NewServiceState extends State<NewService> {
                         ),
                         title: TextField(
                           keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18,color: Colors.white),
+                          style: TextStyle(fontSize: 18, color: Colors.white),
                           controller: _rateController,
                           decoration: InputDecoration(
-                            hintText: "Rate of the service",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            labelText: "Rate",
-                              labelStyle:
-                              TextStyle(color: Colors.grey[400])
-                          ),
+                              hintText: "Rate of the service",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              labelText: "Rate",
+                              labelStyle: TextStyle(color: Colors.grey[400])),
                         ),
                       ),
                     ),
@@ -109,15 +106,15 @@ class _NewServiceState extends State<NewService> {
                 ),
               ),
             ),
-
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5.0),
               child: Center(
-                child: RaisedButton(
-                  color: Colors.blue,
-                  textColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      textStyle: TextStyle(color: Colors.white),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0))),
                   child: Text(
                     "Save",
                     style: TextStyle(fontSize: 14),
@@ -125,25 +122,25 @@ class _NewServiceState extends State<NewService> {
                   onPressed: () {
                     if (_nameController.text.isEmpty ||
                         _rateController.text.isEmpty) {
-                      Scaffold.of(bc).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(bc).showSnackBar(SnackBar(
                           content: Text("Rate and Name can't be empty!")));
                       return;
                     }
 
                     if (widget._isEdit == true) {
                       Service service = Service(
-                          id: widget._service.id,
+                          id: widget._service!.id,
                           name: _nameController.text,
                           rate: _rateController.text);
                       Service.updateService(service);
-                      Scaffold.of(bc).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(bc).showSnackBar(SnackBar(
                           content: Text("Service updated successfully!")));
                     } else {
                       Service service = Service(
                           name: _nameController.text,
                           rate: _rateController.text);
                       Service.insertService(service);
-                      Scaffold.of(bc).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(bc).showSnackBar(SnackBar(
                           content: Text("Service inserted successfully!")));
                     }
                     Navigator.pop(context, true);

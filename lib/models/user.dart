@@ -93,19 +93,15 @@ class User {
     try {
       return User.fromMap(results.first);
     } catch (error) {
-      return null;
+      throw Exception("User was null from database");
     }
   }
 
   static insertUser(User user) async {
-    final db = await DBHelper.db.database;
-    var results = await db.insert("User", user.toMap());
   }
 
   static updateUser(User user) async {
-    final db = await DBHelper.db.database;
     var map = user.toMap();
     map.remove("id");
-    var results = await db.update("User", map);
   }
 }

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import 'package:mr_invoice/new_client.dart';
+import 'package:mr_invoice/settings/client/new_client.dart';
 
-import 'models/client.dart';
+import '../../models/client.dart';
 
+//ignore: must_be_immutable
 class ClientsListPage extends StatefulWidget {
-  bool _isSelectable;
 
   @override
   _ClientsListPageState createState() => _ClientsListPageState();
 
-  ClientsListPage({isSelectable}) : _isSelectable = isSelectable;
+  ClientsListPage({isSelectable});
 }
 
 class _ClientsListPageState extends State<ClientsListPage> {
@@ -23,7 +23,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
         future: Client.getAllClients(),
         // ignore: missing_return
         builder: (BuildContext context, AsyncSnapshot<List<Client>> snapshot) {
-          if (!snapshot.hasData || snapshot.data.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return emptyClientListView(snapshot);
           } else {
             return getClientsList(snapshot);
@@ -47,12 +47,14 @@ class _ClientsListPageState extends State<ClientsListPage> {
             SizedBox(
               height: 10,
             ),
-            RaisedButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                textStyle: TextStyle(color: Colors.white),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0))
+              ),
               child: Text("Add a new client"),
-              color: Colors.blue,
-              textColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
               onPressed: () async {
                 var result = await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NewClient(
@@ -75,7 +77,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
         title: Text("Available Clients"),
       ),
       body: ListView.builder(
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             return Padding(
               padding: EdgeInsets.fromLTRB(0, 2.0, 0, 0),
@@ -110,7 +112,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 5.0, 0, 5.0),
                             child: Text(
-                              snapshot.data[index].name,
+                              snapshot.data![index].name,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 16,
@@ -120,7 +122,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 2.0, 0, 0.0),
-                            child: Text(snapshot.data[index].email,
+                            child: Text(snapshot.data![index].email,
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w300,
@@ -128,7 +130,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(4.0, 0.0, 0, 4.0),
-                            child: Text(snapshot.data[index].phoneNo,
+                            child: Text(snapshot.data![index].phoneNo,
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w300,
@@ -149,7 +151,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
                               MaterialPageRoute(
                                   builder: (context) => NewClient(
                                       isEdit: true,
-                                      client: snapshot.data[index])));
+                                      client: snapshot.data![index])));
                           print("Result: $result");
                           if (result == true) {
                             setState(() {});
@@ -170,7 +172,7 @@ class _ClientsListPageState extends State<ClientsListPage> {
                             var resultText = result == 1
                                 ? "Deleted Successfully"
                                 : "Failed to delete,Please try later";
-                            Scaffold.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("$resultText")));
                           }
                         },
@@ -206,13 +208,13 @@ class _ClientsListPageState extends State<ClientsListPage> {
   Widget buildDialog(
       BuildContext context, AsyncSnapshot<List<Client>> snapshot, int index) {
     return AlertDialog(
-      title: Text("Delete ${snapshot.data[index].name}?"),
+      title: Text("Delete ${snapshot.data![index].name}?"),
       content: Text("Are you sure you want to delete this item?"),
       actions: [
         MaterialButton(
             child: Text("OK"),
             onPressed: () async {
-              result = await Client.deleteClient(snapshot.data[index].id);
+              result = await Client.deleteClient(snapshot.data![index].id!);
               print("Result:$result");
               Navigator.pop(context, true);
               setState(() {});

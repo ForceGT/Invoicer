@@ -6,7 +6,7 @@ import 'package:mr_invoice/database/db_helper.dart';
 class Client {
 
 
-  int _id;
+  int? _id;
   String _name;
   String _email;
   String _phoneNo;
@@ -19,7 +19,7 @@ class Client {
 
   String get name => _name;
 
-  int get id => _id;
+  int? get id => _id;
 
 
 

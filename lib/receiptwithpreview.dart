@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mr_invoice/models/reciept.dart';
-import 'package:mr_invoice/new_receipt_form.dart';
-import 'package:printing/printing.dart';
-import 'receiptbuilder.dart';
+
+import 'package:mr_invoice/receipt/new_receipt_form.dart';
+
 
 class ReceiptWithPreview extends StatefulWidget {
-  const ReceiptWithPreview({Key key}) : super(key: key);
+  const ReceiptWithPreview({Key? key}) : super(key: key);
 
   @override
   ReceiptWithPreviewState createState() => ReceiptWithPreviewState();

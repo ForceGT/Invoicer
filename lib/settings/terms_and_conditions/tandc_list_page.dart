@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:mr_invoice/new_term_and_condition.dart';
-import 'models/TandC.dart';
-import 'models/invoice.dart';
-import 'invoicebuilder.dart';
+import 'package:mr_invoice/settings/terms_and_conditions/new_term_and_condition.dart';
+import '../../models/TandC.dart';
+import '../../models/invoice.dart';
+import '../../invoice/invoicebuilder.dart';
 
 class TandCListPage extends StatefulWidget {
-  bool _isSelectable;
-  Invoice _invoice;
+  final bool? _isSelectable;
+  final Invoice? _invoice;
+  final bool? _isEstimate;
 
   @override
   _TandCListPageState createState() => _TandCListPageState();
 
-  TandCListPage({isSelectable, invoice})
+  TandCListPage({isSelectable, invoice, isEstimate})
       : _isSelectable = isSelectable,
+        _isEstimate = isEstimate,
         _invoice = invoice;
 }
 
 class _TandCListPageState extends State<TandCListPage> {
   var result;
-  List<int> tAndCIds;
-  List<bool> checkedTerms;
+  late List<int> tAndCIds;
+  late List<bool> checkedTerms;
   var anyTermChecked = false;
 
   @override
   void initState() {
     super.initState();
     tAndCIds = [];
-    checkedTerms = List();
+    checkedTerms = List.empty();
   }
 
   @override
@@ -35,11 +36,8 @@ class _TandCListPageState extends State<TandCListPage> {
     return FutureBuilder(
         future: TandC.getAllTandCfromDB(),
         builder: (BuildContext context, AsyncSnapshot<List<TandC>> snapshot) {
-          if (!snapshot.hasData)
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          if (snapshot.data.isEmpty) {
+
+          if (snapshot.data == null || snapshot.data!.isEmpty) {
             return getEmptyTermsView(context, snapshot);
           } else {
             if (widget._isSelectable == true) {
@@ -68,12 +66,13 @@ class _TandCListPageState extends State<TandCListPage> {
             SizedBox(
               height: 10,
             ),
-            RaisedButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                  textStyle: TextStyle(color: Colors.white),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0))),
               child: Text("Add a new T&C"),
-              color: Colors.blue,
-              textColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
               onPressed: () async {
                 var result = await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NewTerm(
@@ -97,7 +96,7 @@ class _TandCListPageState extends State<TandCListPage> {
         title: Text("All Available Terms"),
       ),
       body: ListView.builder(
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             return Padding(
               padding: EdgeInsets.fromLTRB(0, 2.0, 0, 0),
@@ -124,7 +123,7 @@ class _TandCListPageState extends State<TandCListPage> {
                       Flexible(
                           flex: 4,
                           child: Text(
-                            "${snapshot.data[index].terms}",
+                            "${snapshot.data![index].terms}",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -145,7 +144,8 @@ class _TandCListPageState extends State<TandCListPage> {
                                           .push(MaterialPageRoute(
                                               builder: (context) => NewTerm(
                                                   isEdit: true,
-                                                  term: snapshot.data[index])));
+                                                  term:
+                                                      snapshot.data![index])));
                                       print("Result: $result");
                                       if (result == true) {
                                         setState(() {});
@@ -169,8 +169,8 @@ class _TandCListPageState extends State<TandCListPage> {
                                         var resultText = result == 1
                                             ? "Deleted Successfully"
                                             : "Failed to delete,Please try later";
-                                        Scaffold.of(context).showSnackBar(
-                                            SnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
                                                 content: Text("$resultText")));
                                       }
                                     },
@@ -182,14 +182,14 @@ class _TandCListPageState extends State<TandCListPage> {
                                     shape: BoxShape.rectangle,
                                     borderRadius: BorderRadius.circular(24.0),
                                     color:
-                                        snapshot.data[index].type == "default"
+                                        snapshot.data![index].type == "default"
                                             ? Colors.blue
                                             : Color(0xFF346588),
                                   ),
                                   padding: EdgeInsets.all(8.0),
-                                  child: snapshot.data[index].type == "default"
+                                  child: snapshot.data![index].type == "default"
                                       ? Text(
-                                          "${snapshot.data[index].type.toUpperCase()}",
+                                          "${snapshot.data![index].type.toUpperCase()}",
                                           style: TextStyle(
                                             color: Colors.white,
                                           ),
@@ -235,7 +235,7 @@ class _TandCListPageState extends State<TandCListPage> {
         MaterialButton(
             child: Text("OK"),
             onPressed: () async {
-              result = await TandC.deleteItem(snapshot.data[index].id);
+              result = await TandC.deleteItem(snapshot.data![index].id!);
               print("Result:$result");
               Navigator.pop(context, true);
               setState(() {});
@@ -256,10 +256,10 @@ class _TandCListPageState extends State<TandCListPage> {
         title: Text("Select a term"),
       ),
       body: ListView.builder(
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
-            checkedTerms.add(snapshot.data[index].isSelected);
-            if (snapshot.data[index].type == "default") {
+            checkedTerms.add(snapshot.data![index].isSelected);
+            if (snapshot.data![index].type == "default") {
               checkedTerms[index] = true;
               return Padding(
                 padding: EdgeInsets.fromLTRB(0, 2.0, 0, 0),
@@ -275,9 +275,10 @@ class _TandCListPageState extends State<TandCListPage> {
                         value: true,
                         onChanged: null,
                         title: Text(
-                          "${snapshot.data[index].terms}",
+                          "${snapshot.data![index].terms}",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         secondary: Container(
                             width: 75,
@@ -287,7 +288,7 @@ class _TandCListPageState extends State<TandCListPage> {
                                 color: Colors.blue),
                             padding: EdgeInsets.all(6.0),
                             child: Text(
-                              "${snapshot.data[index].type.toUpperCase()}",
+                              "${snapshot.data![index].type.toUpperCase()}",
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -322,9 +323,10 @@ class _TandCListPageState extends State<TandCListPage> {
                           });
                         },
                         title: Text(
-                          "${snapshot.data[index].terms}",
+                          "${snapshot.data![index].terms}",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       )),
                 ),
@@ -371,29 +373,33 @@ class _TandCListPageState extends State<TandCListPage> {
             ),
             onPressed: () async {
               checkedTerms.removeRange(
-                  snapshot.data.length, checkedTerms.length);
+                  snapshot.data!.length, checkedTerms.length);
               if (tAndCIds.isNotEmpty) tAndCIds.clear();
-              // GOTO T and C selection
-              for (int i = 0; i < snapshot.data.length; i++) {
+              for (int i = 0; i < snapshot.data!.length; i++) {
                 if (checkedTerms[i]) {
-                  tAndCIds.add(snapshot.data[i].id);
+                  tAndCIds.add(snapshot.data![i].id!);
                 }
               }
               // print("tAndCIds:$tAndCIds");
               // print("${tAndCIds.join(",")}");
-              widget._invoice.tAndCId = "(" + tAndCIds.join(",") + ")";
-              print("Widget Invoice For Name: ${widget._invoice.forName}");
-              print(
-                  "Widget Invoice Product Ids: ${widget._invoice.listofProductIds}");
-              print("Widget Invoice TAndCId: ${widget._invoice.tAndCId}");
+              widget._invoice!.tAndCId = "(" + tAndCIds.join(",") + ")";
+              // print("Widget Invoice For Name: ${widget._invoice.forName}");
+              // print(
+              //     "Widget Invoice Product Ids: ${widget._invoice.listofProductIds}");
+              // print("Widget Invoice TAndCId: ${widget._invoice.tAndCId}");
 
               //Invoice.insertInvoice(widget._invoice);
-              InvoiceBuilder invoiceBuilder = InvoiceBuilder(regenerate: false,invoice: widget._invoice);
+
+              print("T and C Estimate ${widget._isEstimate}");
+              InvoiceBuilder invoiceBuilder = InvoiceBuilder(
+                  regenerate: widget._isEstimate == true ? true : false,
+                  invoice: widget._invoice,
+                  isEstimate: widget._isEstimate);
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => invoiceBuilder
-                          .getInvoicePdfPreview()));
+                      builder: (context) =>
+                          invoiceBuilder.getInvoicePdfPreview()));
             },
           ),
         ),

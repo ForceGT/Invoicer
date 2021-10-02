@@ -2,7 +2,7 @@
 import 'package:mr_invoice/database/db_helper.dart';
 
 class Service {
-  int _id;
+  int? _id;
   String _name;
 
   bool _isSelected=false;
@@ -24,7 +24,7 @@ class Service {
     _isSelected = value;
   }
 
-  int get id => _id;
+  int? get id => _id;
   static final columns = ["id", "name", "rate"];
 
   factory Service.fromMap(Map<String, dynamic> data) {
@@ -37,13 +37,13 @@ class Service {
     switch (index) {
       case 0:
         return _id.toString();
-        break;
       case 1:
         return _name.toString();
-        break;
       case 2:
         return _rate.toString();
-        break;
+
+      default:
+        return "";
     }
   }
 

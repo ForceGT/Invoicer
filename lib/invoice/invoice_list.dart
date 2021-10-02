@@ -2,9 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:mr_invoice/invoicewithpreview.dart';
 import 'package:mr_invoice/widgets/invoice_list_item.dart';
-import 'package:mr_invoice/list_search.dart';
-import 'models/invoice.dart';
+import 'package:mr_invoice/common/list_search.dart';
+import '../models/invoice.dart';
 
 enum SearchOptions { byDate, byName }
 
@@ -14,7 +15,6 @@ class InvoiceList extends StatefulWidget {
 }
 
 class _InvoiceListState extends State<InvoiceList> {
-  SearchOptions _selection = SearchOptions.byName;
 
   @override
   Widget build(BuildContext context) {
@@ -37,29 +37,30 @@ class _InvoiceListState extends State<InvoiceList> {
               showSearch(context: context, delegate: ListSearch(type: "invoice"));
             },
           ),
-          PopupMenuButton<SearchOptions>(
-              tooltip: "Categories",
-              shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(40.0),
-                      bottomRight: Radius.circular(40.0))),
-              onSelected: (SearchOptions options) {
-                _selection = options;
-              },
-              icon: Icon(Icons.category, color: Colors.white,),
-              itemBuilder: (BuildContext context) => [
-                CheckedPopupMenuItem(
-                  value: SearchOptions.byName,
-                  checked: _selection == SearchOptions.byName,
-                  child: Text("By Name"),
-                ),
-                CheckedPopupMenuItem(
-                  value: SearchOptions.byDate,
-                  checked: _selection == SearchOptions.byDate,
-                  child: Text("By Date"),
-                )
-              ]),
         ],
+        //   PopupMenuButton<SearchOptions>(
+        //       tooltip: "Categories",
+        //       shape: ContinuousRectangleBorder(
+        //           borderRadius: BorderRadius.only(
+        //               bottomLeft: Radius.circular(40.0),
+        //               bottomRight: Radius.circular(40.0))),
+        //       onSelected: (SearchOptions options) {
+        //         _selection = options;
+        //       },
+        //       icon: Icon(Icons.category, color: Colors.white,),
+        //       itemBuilder: (BuildContext context) => [
+        //         CheckedPopupMenuItem(
+        //           value: SearchOptions.byName,
+        //           checked: _selection == SearchOptions.byName,
+        //           child: Text("By Name"),
+        //         ),
+        //         CheckedPopupMenuItem(
+        //           value: SearchOptions.byDate,
+        //           checked: _selection == SearchOptions.byDate,
+        //           child: Text("By Date"),
+        //         )
+        //       ]),
+        // ],
         title: Text("List of Invoices",style: TextStyle(color: Colors.white),),
       ),
       body:_getInvoiceList(context),
@@ -72,14 +73,48 @@ class _InvoiceListState extends State<InvoiceList> {
         future: Invoice.getAllInvoices(),
         builder: (context,AsyncSnapshot<List<Invoice>> snapshot){
 
-          if(!snapshot.hasData || snapshot.data.isEmpty ){
-            return Center(
-              child: Text("No Invoices Added Yet", style: TextStyle(color: Colors.white, fontSize: 18),),
+          if(!snapshot.hasData || snapshot.data!.isEmpty ){
+            return Scaffold(
+              body: Container(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "No Invoice added yet",
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        textStyle: TextStyle(color: Colors.white),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0))
+                      ),
+                      child: Text("Add a new invoice"),
+                      onPressed: () async {
+                        var result = await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => InvoiceWithPreview(
+                              isEstimate: false,
+                            )));
+                        if (result == true) {
+                          setState(() {});
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
             );
           }
           else{
-            return ListView.builder(itemCount: snapshot.data.length,itemBuilder: (context,index){
-                return InvoiceListItem(snapshot.data[index]);
+            return ListView.builder(itemCount: snapshot.data!.length,itemBuilder: (context,index){
+                return InvoiceListItem(snapshot.data![index]);
             });
           }
 

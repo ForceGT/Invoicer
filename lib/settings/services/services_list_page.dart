@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mr_invoice/models/invoice.dart';
-import 'package:mr_invoice/new_service.dart';
-import 'package:mr_invoice/tandc_list_page.dart';
-import 'models/service.dart';
+import 'package:mr_invoice/settings/services/new_service.dart';
+import 'package:mr_invoice/settings/terms_and_conditions/tandc_list_page.dart';
+import '../../models/service.dart';
 
 class ServiceListPage extends StatefulWidget {
-  bool _isSelectable;
-  Invoice _invoice;
+  final bool _isSelectable;
+  final Invoice? _invoice;
+  final bool _isEstimate;
 
   @override
   _ServiceListPageState createState() => _ServiceListPageState();
 
-  ServiceListPage({isSelectable, invoice})
+  ServiceListPage({isSelectable, invoice, isEstimate})
       : _isSelectable = isSelectable,
+        _isEstimate = isEstimate,
         _invoice = invoice;
 }
 
@@ -21,14 +23,14 @@ class _ServiceListPageState extends State<ServiceListPage> {
   var result;
   var anyItemChecked = false;
 
-  List<int> productIds;
-  List<bool> checkedServices;
+  late List<int> productIds;
+  late List<bool> checkedServices;
 
   @override
   void initState() {
     super.initState();
     productIds = [];
-    checkedServices = List();
+    checkedServices = List.empty();
   }
 
   @override
@@ -36,10 +38,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
     return FutureBuilder(
         future: Service.getAllServices(),
         builder: (BuildContext context, AsyncSnapshot<List<Service>> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.data.isEmpty) {
+          if (snapshot.data == null || snapshot.data!.isEmpty) {
             return getEmptyServicesView(snapshot);
           } else {
             if (widget._isSelectable == true) {
@@ -67,12 +66,13 @@ class _ServiceListPageState extends State<ServiceListPage> {
             SizedBox(
               height: 10,
             ),
-            RaisedButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                  textStyle: TextStyle(color: Colors.white),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0))),
               child: Text("Add a new service"),
-              color: Colors.blue,
-              textColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
               onPressed: () async {
                 var result = await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NewService(
@@ -95,7 +95,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
         title: Text("Available Services"),
       ),
       body: ListView.builder(
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             return Padding(
               padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
@@ -112,14 +112,19 @@ class _ServiceListPageState extends State<ServiceListPage> {
                         size: 34, color: Colors.black87),
                   ),
                   title: Text(
-                    snapshot.data[index].name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                    snapshot.data![index].name,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
-                  subtitle: Text("Rs " + snapshot.data[index].rate,style:TextStyle(color: Color(0xFFd4d4d1))),
+                  subtitle: Text("Rs " + snapshot.data![index].rate,
+                      style: TextStyle(color: Color(0xFFd4d4d1))),
                   trailing: Wrap(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.delete, size: 26,color: Color(0xFFfffde1)),
+                        icon: Icon(Icons.delete,
+                            size: 26, color: Color(0xFFfffde1)),
                         onPressed: () async {
                           bool dialogShowCompleted;
                           dialogShowCompleted = await showDialog(
@@ -132,19 +137,20 @@ class _ServiceListPageState extends State<ServiceListPage> {
                             var resultText = result == 1
                                 ? "Deleted Successfully"
                                 : "Failed to delete,Please try later";
-                            Scaffold.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("$resultText")));
                           }
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.edit_outlined, size: 26,color: Color(0xFFfffde1)),
+                        icon: Icon(Icons.edit_outlined,
+                            size: 26, color: Color(0xFFfffde1)),
                         onPressed: () async {
                           bool result = await Navigator.of(context)
                               .push(MaterialPageRoute(
                                   builder: (context) => NewService(
                                         isEdit: true,
-                                        service: snapshot.data[index],
+                                        service: snapshot.data![index],
                                       )));
                           if (result == true) {
                             setState(() {});
@@ -182,13 +188,13 @@ class _ServiceListPageState extends State<ServiceListPage> {
   Widget buildDialog(
       BuildContext context, AsyncSnapshot<List<Service>> snapshot, int index) {
     return AlertDialog(
-      title: Text("Delete ${snapshot.data[index].name}?"),
+      title: Text("Delete ${snapshot.data![index].name}?"),
       content: Text("Are you sure you want to delete this item?"),
       actions: [
         MaterialButton(
             child: Text("OK"),
             onPressed: () async {
-              result = await Service.deleteService(snapshot.data[index].id);
+              result = await Service.deleteService(snapshot.data![index].id!);
               print("Result:$result");
               Navigator.pop(context, true);
               setState(() {});
@@ -208,11 +214,11 @@ class _ServiceListPageState extends State<ServiceListPage> {
         title: Text("Select a service"),
       ),
       body: ListView.builder(
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             //print("Initial snapshot.data[index].isSelected: ${snapshot.data[index].isSelected }");
 
-            checkedServices.add(snapshot.data[index].isSelected);
+            checkedServices.add(snapshot.data![index].isSelected);
             return Padding(
               padding: EdgeInsets.fromLTRB(0, 2.0, 0, 0),
               child: Card(
@@ -239,10 +245,16 @@ class _ServiceListPageState extends State<ServiceListPage> {
                     });
                   },
                   title: Text(
-                    snapshot.data[index].name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                    snapshot.data![index].name,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
-                  subtitle: Text("Rs " + snapshot.data[index].rate,style: TextStyle(color: Colors.grey[400]),),
+                  subtitle: Text(
+                    "Rs " + snapshot.data![index].rate,
+                    style: TextStyle(color: Colors.grey[400]),
+                  ),
                   value: checkedServices[index],
                 ),
               ),
@@ -289,25 +301,28 @@ class _ServiceListPageState extends State<ServiceListPage> {
             onPressed: () {
               var totalAmount = 0;
               checkedServices.removeRange(
-                  snapshot.data.length, checkedServices.length);
+                  snapshot.data!.length, checkedServices.length);
               if (productIds.isNotEmpty) productIds.clear();
               // GOTO T and C selection
-              for (int i = 0; i < snapshot.data.length; i++) {
+              for (int i = 0; i < snapshot.data!.length; i++) {
                 if (checkedServices[i]) {
-                  productIds.add(snapshot.data[i].id);
-                  totalAmount += int.parse(snapshot.data[i].rate);
+                  productIds.add(snapshot.data![i].id!);
+                  totalAmount += int.parse(snapshot.data![i].rate);
                 }
               }
               // print("CheckedListLength:${checkedServices.length}");
               // print("Finally selected product ids: $productIds");
-              widget._invoice.listofProductIds =
+              widget._invoice!.listofProductIds =
                   "(" + productIds.join(",") + ")";
-              widget._invoice.amount = totalAmount;
+              widget._invoice!.amount = totalAmount;
               // print("${widget._invoice.listofProductIds}");
               // print("${widget._invoice.amount}");
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                print("Services Estimate:${widget._isEstimate}");
                 return TandCListPage(
-                    isSelectable: true, invoice: widget._invoice);
+                    isEstimate: widget._isEstimate,
+                    isSelectable: true,
+                    invoice: widget._invoice);
               }));
             },
           ),

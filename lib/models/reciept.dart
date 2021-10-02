@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mr_invoice/database/db_helper.dart';
 
 class Receipt {
-  int _id;
+  int? _id;
   int _amount;
   String _note;
   String _date;
@@ -30,7 +30,49 @@ class Receipt {
         _tAndCId = tAndCId;
 
 
-  int get id => _id;
+  int? get id => _id;
+
+  int get amount => _amount;
+
+  String get note => _note;
+
+  String get date => _date;
+
+  String get fromName => _fromName;
+
+  String get forInvoice => _forInvoice;
+
+  String get tAndCId => _tAndCId;
+
+  set amount(int value) {
+    _amount = value;
+  }
+
+  set note(String value) {
+    _note = value;
+  }
+
+  set date(String value) {
+    _date = value;
+  }
+
+  set fromName(String value) {
+    _fromName = value;
+  }
+
+  set forInvoice(String value) {
+    _forInvoice = value;
+  }
+
+  set tAndCId(String value) {
+    _tAndCId = value;
+  }
+
+
+  set id(int? value) {
+    _id = value;
+  }
+
   static final columns = [
     "id",
     "amount",
@@ -41,7 +83,7 @@ class Receipt {
     "tAndCId"
   ];
 
-  factory Receipt.fromMap(Map<String, dynamic> data) {
+  factory Receipt.fromMap(Map<dynamic, dynamic> data) {
     return Receipt(
         amount: data["amount"],
         date: data["date"],
@@ -67,7 +109,7 @@ class Receipt {
     List<Map> allReceipts =
         await db.query("Receipts", columns: Receipt.columns, orderBy: "id ASC");
 
-    List<Receipt> receipts = new List();
+    List<Receipt> receipts = new List.empty();
     allReceipts.forEach((result) {
       Receipt receipt = Receipt.fromMap(result);
       receipts.add(receipt);
@@ -79,10 +121,9 @@ class Receipt {
   static Future<int> getLatestId() async {
     final db = await DBHelper.db.database;
     //print(db);
-    var latestId =
-        await db.rawQuery("SELECT MAX(id)+1 as last_inserted_id FROM Receipts");
+    var latestId = await db.rawQuery("SELECT MAX(id)+1 as last_inserted_id FROM Receipts");
     //print("latestId="+latestId.toString()+"\n");
-    return latestId.first["last_inserted_id"] == null? 1:latestId.first["last_inserted_id"];
+    return latestId.first["last_inserted_id"] == null ? 1 : latestId.first["last_inserted_id"] as int;
   }
 
   static Future<List<Receipt>> getReceiptByName(String name) async {
@@ -99,6 +140,8 @@ class Receipt {
 
   static insertReceipt(Receipt receipt) async {
     final db = await DBHelper.db.database;
+
+    print("Insert Receipt Called");
 
     var result = await db.rawInsert(
         "INSERT Into Receipts(amount,note,date,fromName,forInvoiceId,tAndCId) "
@@ -121,19 +164,7 @@ class Receipt {
   }
 
   static deleteReceipt(int id) async {
-    final db = await DBHelper.db.database;
-    var result = db.delete("Receipts", where: "id = ?", whereArgs: [id]);
   }
 
-  int get amount => _amount;
 
-  String get note => _note;
-
-  String get date => _date;
-
-  String get fromName => _fromName;
-
-  String get forInvoice => _forInvoice;
-
-  String get tAndCId => _tAndCId;
 }
