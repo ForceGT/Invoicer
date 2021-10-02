@@ -30,10 +30,10 @@ Flutter - 2.5.1
 
 ### Android
 
-![](static/1.png) | ![](static/2.png) | ![](static/3.png) | ![](static/4.png)
-:-----------------:|:-----------------:|:----------------:|:----------------:
-![](static/5.png) | ![](static/6.png) | ![](static/7.png) | ![](static/8.png)
-:-----------------:|:-----------------:|:----------------:|:----------------:
-![](static/9.png) | ![](static/10.png) | ![](static/11.png)
+<p float="left">
+  <img src="static/1.png" width="100" />
+  <img src="static/2.png" width="100" />
+  <img src="static/3.png" width="100" />
+</p>
 
 
