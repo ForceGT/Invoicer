@@ -49,7 +49,6 @@ Flutter - 2.5.1
     <tr>
         <td><img src="static/android/10.png" width=270 height=520></td>
         <td><img src="static/android/11.png" width=270 height=520></td>
-
       </tr>
 
 </table>
