@@ -59,16 +59,19 @@ Flutter - 2.5.1
 
 
 <table>
- <tr>
-    <td><img src="static/ios/1.png" width=270 height=480></td>
-    <td><img src="static/ios/2.png" width=270 height=480></td>
-    <td><img src="static/ios/3.png" width=270 height=480></td>
-    <td><img src="static/ios/4.png" width=270 height=480></td>
-  </tr>
-  <tr>
-      <td><img src="static/ios/5.png" width=270 height=480></td>
-      <td><img src="static/ios/6.png" width=270 height=480></td>
-      <td><img src="static/ios/7.png" width=270 height=480></td>
+    <tr>
+        <td><img src="static/ios/1.png" width=270 height=520></td>
+        <td><img src="static/ios/2.png" width=270 height=520></td>
+        <td><img src="static/ios/3.png" width=270 height=520></td>
     </tr>
+    <tr>
+            <td><img src="static/ios/4.png" width=270 height=520></td>
+            <td><img src="static/ios/5.png" width=270 height=520></td>
+            <td><img src="static/ios/6.png" width=270 height=520></td>
+        </tr>
+
+    <tr>
+            <td><img src="static/ios/7.png" width=270 height=520></td>
+        </tr>
 </table>
 
