@@ -1,16 +1,25 @@
-# mr_invoice
+# Invoicer - Managing invoices made easy
 
-A new Flutter application.
+An application built entirely in flutter for managing invoices. Personally the inspiration for this project was the fact that one of my friends
+had to put in a lot of effort to generate a simple fixed kind of pdf for his clients and thus this project came up
 
-## Getting Started
+## Features
+- Add custom Terms and Conditions
+- Add custom Services and Products (only Rs supported as the currency for the price)
+- Generate Invoice from the entered details in pdf format
+- Generate Receipt from the entered details in pdf format, Account Management [WIP]
+- Generate an Estimate from the entered details in pdf format
 
-This project is a starting point for a Flutter application.
+## Lessons/Concepts Learnt
+- How to generate a pdf in flutter, in a specific format and template
+- How to work with Databases (SQL)
+- Learning to draw Custom Curves
+- How to take signature input from user by making him draw it
+- How to pick files from the storage for both the platforms (Android and IOS)
+- Bits of sound null-safety
+- Working with asynchronous dart, involved in database operations
 
-A few resources to get you started if this is your first Flutter project:
+## Works with
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Dart - 2.14.2 null-safety enabled
+Flutter - 2.5.1
