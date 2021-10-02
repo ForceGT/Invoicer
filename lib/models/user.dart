@@ -4,7 +4,7 @@ import 'package:mr_invoice/database/db_helper.dart';
 class User {
   String _logoImagePath;
   String _signImagePath;
-  int _id;
+  int? _id;
   String _companyName;
   String _username;
   String _address;
@@ -34,7 +34,7 @@ class User {
 
   String get companyName => _companyName;
 
-  int get id => _id;
+  int? get id => _id;
 
   String get userName => _username;
 
@@ -98,10 +98,14 @@ class User {
   }
 
   static insertUser(User user) async {
+    final db = await DBHelper.db.database;
+    var results = await db.insert("User", user.toMap());
   }
 
   static updateUser(User user) async {
+    final db = await DBHelper.db.database;
     var map = user.toMap();
     map.remove("id");
+    var results = await db.update("User", map);
   }
 }

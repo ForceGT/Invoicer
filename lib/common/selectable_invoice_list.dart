@@ -68,7 +68,7 @@ class _SelectableInvoiceListState extends State<SelectableInvoiceList> {
                             if (checkedServices[index])
                               {
 
-                                   widget._receipt.amount+=snapshot.data![index].amount;
+                                   widget._receipt.amount+=snapshot.data![index].amount!;
                                // widget._receipt.amount -= snapshot.data[index].amount;
                                 // widget._receipt.forInvoice ="";
                                 widget._receipt.forInvoice +=
@@ -76,7 +76,7 @@ class _SelectableInvoiceListState extends State<SelectableInvoiceList> {
                                 snapshot.data![index].forReceiptId =widget._receipt.id!;
                               }
                             else{
-                              widget._receipt.amount-=snapshot.data![index].amount;
+                              widget._receipt.amount-=snapshot.data![index].amount!;
                             }
 
                             checkedServices.removeRange(

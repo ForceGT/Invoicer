@@ -28,7 +28,7 @@ class _TandCListPageState extends State<TandCListPage> {
   void initState() {
     super.initState();
     tAndCIds = [];
-    checkedTerms = List.empty();
+    checkedTerms = [];
   }
 
   @override

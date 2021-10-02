@@ -9,6 +9,7 @@ had to put in a lot of effort to generate a simple fixed kind of pdf for his cli
 - Generate Invoice from the entered details in pdf format
 - Generate Receipt from the entered details in pdf format, Account Management [WIP]
 - Generate an Estimate from the entered details in pdf format
+- Focus on building a good UI as well as UX
 
 ## Lessons/Concepts Learnt
 - How to generate a pdf in flutter, in a specific format and template
@@ -22,4 +23,17 @@ had to put in a lot of effort to generate a simple fixed kind of pdf for his cli
 ## Works with
 
 Dart - 2.14.2 null-safety enabled
+
 Flutter - 2.5.1
+
+## Screenshots
+
+### Android
+
+![](static/1.png) | ![](static/2.png) | ![](static/3.png) | ![](static/4.png)
+:-----------------:|:-----------------:|:----------------:|:----------------:
+![](static/5.png) | ![](static/6.png) | ![](static/7.png) | ![](static/8.png)
+:-----------------:|:-----------------:|:----------------:|:----------------:
+![](static/9.png) | ![](static/10.png) | ![](static/11.png)
+
+

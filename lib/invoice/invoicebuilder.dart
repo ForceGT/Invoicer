@@ -49,11 +49,16 @@ class InvoiceBuilder {
   }
 
   Future<Uint8List> buildInvoicePdf(PdfPageFormat pageFormat) async {
-    client = await getClientDetails(this._invoice.forName);
-    services = await Service.getServiceFromIds(this._invoice.listofProductIds);
-    terms = await TandC.getTermsByIds(this._invoice.tAndCId);
+    client = await getClientDetails(this._invoice.forName!);
+    services = await Service.getServiceFromIds(this._invoice.listofProductIds!);
+    terms = await TandC.getTermsByIds(this._invoice.tAndCId!);
     user = await User.getUserFromDatabase();
-    invId = _invoice == null ? await Invoice.getLatestId() : _invoice.id!;
+    if(_invoice.id == null){
+      invId = 1;
+    }else{
+      invId = _invoice.id!;
+    }
+
     if (!_regenerate) {
       Invoice.insertInvoice(this._invoice);
     }

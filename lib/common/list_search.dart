@@ -108,7 +108,7 @@ class ListSearch extends SearchDelegate<String> {
             return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  if (snapshot.data![index].forName.contains(query))
+                  if (snapshot.data![index].forName!.contains(query))
                     return InvoiceListItem(snapshot.data![index]);
                   else {
                     return SizedBox.shrink();

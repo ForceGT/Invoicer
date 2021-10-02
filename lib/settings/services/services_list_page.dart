@@ -30,7 +30,7 @@ class _ServiceListPageState extends State<ServiceListPage> {
   void initState() {
     super.initState();
     productIds = [];
-    checkedServices = List.empty();
+    checkedServices = [];
   }
 
   @override

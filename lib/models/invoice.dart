@@ -2,15 +2,15 @@ import 'package:mr_invoice/database/db_helper.dart';
 
 class Invoice {
   int? _id;
-  int _amount;
-  String _note;
-  String _tAndCId;
+  int? _amount;
+  String? _note;
+  String? _tAndCId;
 
   //The entire listOfProductIds will be stored as a single string separated by |
 
-  String _forName;
-  String _date;
-  int _forReceiptId;
+  String? _forName;
+  String? _date;
+  int? _forReceiptId;
   bool _isSelected = false;
 
   bool get isSelected => _isSelected;
@@ -19,7 +19,7 @@ class Invoice {
     _isSelected = value;
   }
 
-  String _listofProductIds;
+  String? _listofProductIds;
 
   Invoice(
       {id,
@@ -39,47 +39,47 @@ class Invoice {
         _forName = forName,
         _date = date;
 
-  String get date => _date;
+  String? get date => _date;
 
-  String get forName => _forName;
+  String? get forName => _forName;
 
-  String get listofProductIds => _listofProductIds;
+  String? get listofProductIds => _listofProductIds;
 
-  String get tAndCId => _tAndCId;
+  String? get tAndCId => _tAndCId;
 
-  String get note => _note;
+  String? get note => _note;
 
-  int get amount => _amount;
+  int? get amount => _amount;
 
   int? get id => _id;
 
-  int get forReceiptId => _forReceiptId;
+  int? get forReceiptId => _forReceiptId;
 
-  set note(String value) {
+  set note(String? value) {
     _note = value;
   }
 
-  set tAndCId(String value) {
+  set tAndCId(String? value) {
     _tAndCId = value;
   }
 
-  set forName(String value) {
+  set forName(String? value) {
     _forName = value;
   }
 
-  set date(String value) {
+  set date(String? value) {
     _date = value;
   }
 
-  set forReceiptId(int value) {
+  set forReceiptId(int? value) {
     _forReceiptId = value;
   }
 
-  set listofProductIds(String value) {
+  set listofProductIds(String? value) {
     _listofProductIds = value;
   }
 
-  set amount(int value) {
+  set amount(int? value) {
     _amount = value;
   }
 

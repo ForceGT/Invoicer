@@ -444,8 +444,14 @@ class _NewUserState extends State<NewUser> {
                               );
                               if (isEdit == false) {
                                 User.insertUser(user);
+                                ScaffoldMessenger.of(bc).showSnackBar(SnackBar(
+                                  content: Text("User added successfully"),
+                                ));
                               } else {
                                 User.updateUser(user);
+                                ScaffoldMessenger.of(bc).showSnackBar(SnackBar(
+                                  content: Text("User updated successfully"),
+                                ));
                               }
                               Navigator.pop(bc, true);
                             }
