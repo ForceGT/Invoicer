@@ -35,18 +35,22 @@ Flutter - 2.5.1
     <td><img src="static/android/1.png" width=270 height=480></td>
     <td><img src="static/android/2.png" width=270 height=480></td>
     <td><img src="static/android/3.png" width=270 height=480></td>
-    <td><img src="static/android/4.png" width=270 height=480></td>
+
   </tr>
   <tr>
+      <td><img src="static/android/4.png" width=270 height=480></td>
       <td><img src="static/android/5.png" width=270 height=480></td>
       <td><img src="static/android/6.png" width=270 height=480></td>
-      <td><img src="static/android/7.png" width=270 height=480></td>
-      <td><img src="static/android/8.png" width=270 height=480></td>
+
     </tr>
     <tr>
+          <td><img src="static/android/7.png" width=270 height=480></td>
+          <td><img src="static/android/8.png" width=270 height=480></td>
           <td><img src="static/android/9.png" width=270 height=480></td>
-          <td><img src="static/android/10.png" width=270 height=480></td>
-          <td><img src="static/android/11.png" width=270 height=480></td>
+    </tr>
+    <tr>
+              <td><img src="static/android/10.png" width=270 height=480></td>
+              <td><img src="static/android/11.png" width=270 height=480></td>
     </tr>
 </table>
 
