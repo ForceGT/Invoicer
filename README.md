@@ -31,9 +31,9 @@ Flutter - 2.5.1
 ### Android
 
 <p float="left">
-  <img src="static/1.png" width="100" />
-  <img src="static/2.png" width="100" />
-  <img src="static/3.png" width="100" />
+  <img src="/static/1.png" width="100" />
+  <img src="/static/2.png" width="100" />
+  <img src="/static/3.png" width="100" />
 </p>
 
 
