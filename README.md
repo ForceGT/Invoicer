@@ -31,11 +31,40 @@ Flutter - 2.5.1
 ### Android
 
 <table>
-<tr>
-    <td><img src="static/android/1.png" width=270 height=520></td>
-    <td><img src="static/android/2.png" width=270 height=520></td>
-    <td><img src="static/android/3.png" width=270 height=520></td>
+ <tr>
+    <td><img src="static/android/1.png" width=270 height=560></td>
+    <td><img src="static/android/2.png" width=270 height=560></td>
+    <td><img src="static/android/3.png" width=270 height=560></td>
+    <td><img src="static/android/4.png" width=270 height=560></td>
   </tr>
+  <tr>
+      <td><img src="static/android/5.png" width=270 height=560></td>
+      <td><img src="static/android/6.png" width=270 height=560></td>
+      <td><img src="static/android/7.png" width=270 height=560></td>
+      <td><img src="static/android/8.png" width=270 height=560></td>
+    </tr>
+    <tr>
+          <td><img src="static/android/9.png" width=270 height=560></td>
+          <td><img src="static/android/10.png" width=270 height=560></td>
+          <td><img src="static/android/11.png" width=270 height=560></td>
+    </tr>
 </table>
 
+
+### IOS
+
+
+<table>
+ <tr>
+    <td><img src="static/ios/1.png" width=270 height=560></td>
+    <td><img src="static/ios/2.png" width=270 height=560></td>
+    <td><img src="static/ios/3.png" width=270 height=560></td>
+    <td><img src="static/ios/4.png" width=270 height=560></td>
+  </tr>
+  <tr>
+      <td><img src="static/ios/5.png" width=270 height=560></td>
+      <td><img src="static/ios/6.png" width=270 height=560></td>
+      <td><img src="static/ios/7.png" width=270 height=560></td>
+    </tr>
+</table>
 
